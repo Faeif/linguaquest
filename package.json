@@ -9,12 +9,22 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "format": "biome format --write ."
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx,js,json}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   },
   "devDependencies": {
     "@biomejs/biome": "latest",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "turbo": "latest",
     "typescript": "^5.0.0"
   },
@@ -22,5 +32,9 @@
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "volta": {
+    "node": "20.11.0",
+    "pnpm": "9.0.0"
+  }
 }
