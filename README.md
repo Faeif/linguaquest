@@ -15,19 +15,37 @@
 | AI | Gemini 2.0 Flash + Azure Speech |
 | Deploy | Vercel |
 
-## Quick Start
+## 🚀 Team Onboarding (Quick Start)
 
-```bash
-# Install dependencies
-pnpm install
+ทีมงานทุกคนต้องทำตามขั้นตอนด้านล่างนี้ในวันแรกที่ดึงโค้ด:
 
-# Setup environment
-cp .env.example .env.local
-# Fill in your values...
+1. **เตรียมเครื่อง (Prerequisites):**
+   - ลง [Docker Desktop](https://www.docker.com/products/docker-desktop/) (ต้องเปิดโปรแกรมทิ้งไว้)
+   - ลง Node.js 20.x และ `pnpm` (แนะนำให้ใช้ [Volta](https://volta.sh/))
+   - ลง [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started) (`brew install supabase/tap/supabase`)
 
-# Run development server
-pnpm dev
-```
+2. **ติดตั้งโปรเจกต์:**
+   ```bash
+   git clone https://github.com/Faeif/linguaquest.git
+   cd linguaquest
+   pnpm install
+   ```
+
+3. **เตรียม Environment Variables:**
+   - ก๊อปปี้ไฟล์ตัวอย่าง: `cp .env.example .env.local`
+   - *หมายเหตุ: ขอ URL และ Keys ของ Supabase/AI จาก Lead Developer มาใส่ใน `.env.local`*
+
+4. **รัน Local Database (Supabase):**
+   ```bash
+   supabase start
+   ```
+   *คำสั่งนี้จะโหลด Docker Image โลคอลมาลงเครื่อง (ครั้งแรกจะนานหน่อย) สตูดิโอฐานข้อมูลจะเปิดที่ `http://localhost:54323`*
+
+5. **รันหน้าเว็บ (Next.js):**
+   ```bash
+   pnpm dev
+   ```
+   *เข้าเว็บได้ที่ `http://localhost:3000`*
 
 ## Project Structure
 

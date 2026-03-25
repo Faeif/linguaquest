@@ -40,11 +40,11 @@ CREATE TABLE profiles (
   avatar_url TEXT,
   email TEXT,
 
-  -- Subscription
+  -- Subscription & Roles
   role TEXT DEFAULT 'user'
-    CHECK (role IN ('user', 'tutor', 'moderator', 'admin', 'super_admin')),
+    CHECK (role IN ('guest', 'user', 'admin')),
   subscription TEXT DEFAULT 'free'
-    CHECK (subscription IN ('free', 'coffee', 'pro', 'tutor')),
+    CHECK (subscription IN ('free', 'pro')),
   subscription_expires_at TIMESTAMPTZ,
 
   -- Onboarding
