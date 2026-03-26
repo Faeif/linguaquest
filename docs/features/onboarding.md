@@ -12,12 +12,12 @@ Collect essential user data to initialize their `ai_user_profile` so the AI Comp
 `profiles` table updates:
 - `display_name` (text)
 - `learning_goal` (text)
-- `cefr_self_assessed` (text)
+- `hsk_self_assessed` (text)
 - `daily_goal_minutes` (int)
 
 `ai_user_profiles` table creation (if not exists):
 - `user_id` (uuid, primary key)
-- `cefr_estimate` (text)
+- `hsk_estimate` (text)
 - `grammar_weak_points` (text array)
 - `active_vocab` (jsonb)
 

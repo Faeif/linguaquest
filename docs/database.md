@@ -48,9 +48,9 @@ CREATE TABLE profiles (
   subscription_expires_at TIMESTAMPTZ,
 
   -- Onboarding
-  goal TEXT CHECK (goal IN ('ielts', 'toeic', 'daily', 'business', 'other')),
-  level TEXT CHECK (level IN ('beginner', 'intermediate', 'advanced')),
-  daily_goal_minutes INTEGER DEFAULT 30,
+  learning_goal TEXT,                -- e.g., 'HSK 4', 'Travel', 'Business (BCT)'
+  hsk_self_assessed TEXT,           -- 'HSK 1', 'HSK 2', etc.
+  daily_goal_minutes INTEGER DEFAULT 15,
   onboarding_completed BOOLEAN DEFAULT false,
 
   -- Trust

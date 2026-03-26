@@ -1,13 +1,14 @@
 # Feature: AI Companion (F08 - MVP Day 2)
 
 ## 🎯 Goal
-A conversational AI interface (Text-only for MVP) that dynamically injects the `ai_user_profile` so the AI "knows" the user's name, goal, and CEFR level.
+A voice-first conversational AI interface that dynamically injects the `ai_user_profile`. It allows the user to practice speaking Chinese back and forth, building confidence without strict tone/pronunciation nitpicking.
 
 ## ✅ Acceptance Criteria
-- [ ] Simple Chat UI (Input bar + message list).
+- [ ] Voice-first UI (Hold to talk / Speech-to-Text).
+- [ ] AI responds with Voice (Text-to-Speech) + Hanzi/Pinyin transcription.
 - [ ] Progressive Language Prompting:
-  - If user is A1/A2 -> AI speaks simple English + Thai feedback.
-  - If user is C1 -> strict academic English.
+  - If user is HSK 1/2 -> AI speaks simple Chinese with Pinyin + Thai feedback.
+  - If user is HSK 5/6 -> strict formal Chinese (Hanzi only).
 - [ ] "Tap-to-Translate" concept stubbed out.
 
 ## 🗄️ Database Changes
