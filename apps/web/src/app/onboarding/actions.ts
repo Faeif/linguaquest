@@ -1,3 +1,5 @@
+'use server'
+
 import { createServerClient } from '@supabase/ssr'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
