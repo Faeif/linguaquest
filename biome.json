@@ -44,10 +44,7 @@
   },
   "overrides": [
     {
-      "includes": [
-        "apps/web/src/lib/supabase/**",
-        "apps/web/src/middleware.ts"
-      ],
+      "includes": ["apps/web/src/lib/supabase/**", "apps/web/src/middleware.ts"],
       "linter": {
         "rules": {
           "style": {

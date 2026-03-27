@@ -51,8 +51,8 @@ export default function LoginPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h2 className="text-2xl font-semibold text-stone-800 tracking-tight">ยินดีต้อนรับกลับ</h2>
-        <p className="text-sm text-stone-500">เข้าสู่ระบบเพื่อเรียนต่อ</p>
+        <h2 className="text-2xl font-semibold text-[#3D3630] tracking-tight">ยินดีต้อนรับกลับ</h2>
+        <p className="text-sm text-[#7A7067]">เข้าสู่ระบบเพื่อเรียนต่อ</p>
       </div>
 
       {/* Google Login */}
@@ -60,10 +60,10 @@ export default function LoginPage() {
         type="button"
         onClick={handleGoogleLogin}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-stone-200 rounded-lg text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors disabled:opacity-60"
+        className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-[#E8E0D5] rounded-lg text-sm font-medium text-[#3D3630] bg-white hover:bg-[#FAF7F2] transition-colors disabled:opacity-60"
       >
         {googleLoading ? (
-          <Loader2 size={16} className="animate-spin text-stone-400" />
+          <Loader2 size={16} className="animate-spin text-[#9A9179]" />
         ) : (
           <GoogleIcon />
         )}
@@ -72,9 +72,9 @@ export default function LoginPage() {
 
       {/* Divider */}
       <div className="flex items-center gap-3">
-        <div className="flex-1 h-px bg-stone-200" />
-        <span className="text-xs text-stone-400">หรือ</span>
-        <div className="flex-1 h-px bg-stone-200" />
+        <div className="flex-1 h-px bg-[#E8E0D5]" />
+        <span className="text-xs text-[#9A9179]">หรือ</span>
+        <div className="flex-1 h-px bg-[#E8E0D5]" />
       </div>
 
       {/* Email Form */}
@@ -86,7 +86,7 @@ export default function LoginPage() {
         )}
 
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-stone-700">
+          <label htmlFor="email" className="text-sm font-medium text-[#3D3630]">
             อีเมล
           </label>
           <input
@@ -95,17 +95,17 @@ export default function LoginPage() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+            className="w-full px-3 py-2.5 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
           />
           {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium text-stone-700">
+            <label htmlFor="password" className="text-sm font-medium text-[#3D3630]">
               รหัสผ่าน
             </label>
-            <Link href="/forgot-password" className="text-xs text-[#8B5E3C] hover:underline">
+            <Link href="/forgot-password" className="text-xs text-[#C4704B] hover:underline">
               ลืมรหัสผ่าน?
             </Link>
           </div>
@@ -116,12 +116,12 @@ export default function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               autoComplete="current-password"
-              className="w-full px-3 py-2.5 pr-10 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+              className="w-full px-3 py-2.5 pr-10 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9A9179] hover:text-[#3D3630] transition-colors"
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -132,16 +132,16 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#8B5E3C] text-white text-sm font-medium rounded-lg hover:bg-[#724C30] transition-colors disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#C4704B] text-white text-sm font-medium rounded-lg hover:bg-[#A85A3A] transition-colors disabled:opacity-60"
         >
           {isSubmitting && <Loader2 size={15} className="animate-spin" />}
           เข้าสู่ระบบ
         </button>
       </form>
 
-      <p className="text-center text-sm text-stone-500">
+      <p className="text-center text-sm text-[#7A7067]">
         ยังไม่มีบัญชี?{' '}
-        <Link href="/register" className="text-[#8B5E3C] font-medium hover:underline">
+        <Link href="/register" className="text-[#C4704B] font-medium hover:underline">
           สมัครสมาชิก
         </Link>
       </p>

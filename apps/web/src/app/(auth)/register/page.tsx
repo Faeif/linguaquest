@@ -25,7 +25,7 @@ function PasswordStrength({ password }: { password: string }) {
           ) : (
             <X size={12} className="text-red-400" />
           )}
-          <span className={`text-[11px] ${c.ok ? 'text-emerald-600' : 'text-stone-400'}`}>
+          <span className={`text-[11px] ${c.ok ? 'text-emerald-600' : 'text-[#9A9179]'}`}>
             {c.label}
           </span>
         </div>
@@ -67,7 +67,7 @@ export default function RegisterPage() {
       )
       return
     }
-    router.push('/verify-email')
+    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
   }
 
   async function handleGoogleLogin() {
@@ -81,8 +81,8 @@ export default function RegisterPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h2 className="text-2xl font-semibold text-stone-800 tracking-tight">สร้างบัญชีใหม่</h2>
-        <p className="text-sm text-stone-500">เริ่มต้นเรียนภาษาจีนได้ฟรี</p>
+        <h2 className="text-2xl font-semibold text-[#3D3630] tracking-tight">สร้างบัญชีใหม่</h2>
+        <p className="text-sm text-[#7A7067]">เริ่มต้นเรียนภาษาจีนได้ฟรี</p>
       </div>
 
       {/* Google Sign-up */}
@@ -90,10 +90,10 @@ export default function RegisterPage() {
         type="button"
         onClick={handleGoogleLogin}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-stone-200 rounded-lg text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors disabled:opacity-60"
+        className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-[#E8E0D5] rounded-lg text-sm font-medium text-[#3D3630] bg-white hover:bg-[#FAF7F2] transition-colors disabled:opacity-60"
       >
         {googleLoading ? (
-          <Loader2 size={16} className="animate-spin text-stone-400" />
+          <Loader2 size={16} className="animate-spin text-[#9A9179]" />
         ) : (
           <GoogleIcon />
         )}
@@ -101,9 +101,9 @@ export default function RegisterPage() {
       </button>
 
       <div className="flex items-center gap-3">
-        <div className="flex-1 h-px bg-stone-200" />
-        <span className="text-xs text-stone-400">หรือ</span>
-        <div className="flex-1 h-px bg-stone-200" />
+        <div className="flex-1 h-px bg-[#E8E0D5]" />
+        <span className="text-xs text-[#9A9179]">หรือ</span>
+        <div className="flex-1 h-px bg-[#E8E0D5]" />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -115,7 +115,7 @@ export default function RegisterPage() {
 
         {/* Name */}
         <div className="space-y-1.5">
-          <label htmlFor="name" className="text-sm font-medium text-stone-700">
+          <label htmlFor="name" className="text-sm font-medium text-[#3D3630]">
             ชื่อ
           </label>
           <input
@@ -124,14 +124,14 @@ export default function RegisterPage() {
             type="text"
             placeholder="ชื่อที่แสดงในระบบ"
             autoComplete="name"
-            className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+            className="w-full px-3 py-2.5 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
           />
           {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
         </div>
 
         {/* Email */}
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-stone-700">
+          <label htmlFor="email" className="text-sm font-medium text-[#3D3630]">
             อีเมล
           </label>
           <input
@@ -140,14 +140,14 @@ export default function RegisterPage() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+            className="w-full px-3 py-2.5 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
           />
           {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
         </div>
 
         {/* Password */}
         <div className="space-y-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-stone-700">
+          <label htmlFor="password" className="text-sm font-medium text-[#3D3630]">
             รหัสผ่าน
           </label>
           <div className="relative">
@@ -157,12 +157,12 @@ export default function RegisterPage() {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               autoComplete="new-password"
-              className="w-full px-3 py-2.5 pr-10 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+              className="w-full px-3 py-2.5 pr-10 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9A9179] hover:text-[#3D3630] transition-colors"
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -173,7 +173,7 @@ export default function RegisterPage() {
 
         {/* Confirm Password */}
         <div className="space-y-1.5">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-stone-700">
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-[#3D3630]">
             ยืนยันรหัสผ่าน
           </label>
           <input
@@ -182,7 +182,7 @@ export default function RegisterPage() {
             type="password"
             placeholder="••••••••"
             autoComplete="new-password"
-            className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+            className="w-full px-3 py-2.5 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
           />
           {errors.confirmPassword && (
             <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
@@ -195,20 +195,20 @@ export default function RegisterPage() {
             {...register('acceptTerms')}
             id="acceptTerms"
             type="checkbox"
-            className="mt-0.5 h-4 w-4 rounded border-stone-300 text-[#8B5E3C] focus:ring-[#8B5E3C] cursor-pointer"
+            className="mt-0.5 h-4 w-4 rounded border-[#E8E0D5] text-[#C4704B] focus:ring-[#C4704B] cursor-pointer"
           />
           <label
             htmlFor="acceptTerms"
-            className="text-xs text-stone-500 leading-relaxed cursor-pointer"
+            className="text-xs text-[#7A7067] leading-relaxed cursor-pointer"
           >
             ฉันยอมรับ{' '}
-            <Link href="/policies/terms" className="text-[#8B5E3C] hover:underline" target="_blank">
+            <Link href="/policies/terms" className="text-[#C4704B] hover:underline" target="_blank">
               ข้อตกลงการใช้งาน
             </Link>{' '}
             และ{' '}
             <Link
               href="/policies/privacy"
-              className="text-[#8B5E3C] hover:underline"
+              className="text-[#C4704B] hover:underline"
               target="_blank"
             >
               นโยบายความเป็นส่วนตัว
@@ -220,16 +220,16 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#8B5E3C] text-white text-sm font-medium rounded-lg hover:bg-[#724C30] transition-colors disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#C4704B] text-white text-sm font-medium rounded-lg hover:bg-[#A85A3A] transition-colors disabled:opacity-60"
         >
           {isSubmitting && <Loader2 size={15} className="animate-spin" />}
           สร้างบัญชี
         </button>
       </form>
 
-      <p className="text-center text-sm text-stone-500">
+      <p className="text-center text-sm text-[#7A7067]">
         มีบัญชีอยู่แล้ว?{' '}
-        <Link href="/login" className="text-[#8B5E3C] font-medium hover:underline">
+        <Link href="/login" className="text-[#C4704B] font-medium hover:underline">
           เข้าสู่ระบบ
         </Link>
       </p>

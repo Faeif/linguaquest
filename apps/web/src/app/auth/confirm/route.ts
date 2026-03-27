@@ -28,12 +28,21 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     })
-    if (!error) {
-      // Auth was successful, check if onboarding is needed, else go to next
+    if (!error && data.user) {
+      // Check if user needs onboarding
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', data.user.id)
+        .single()
+
+      if (!profile?.onboarding_completed) {
+        return NextResponse.redirect(new URL('/onboarding', request.url))
+      }
       return NextResponse.redirect(new URL(next, request.url))
     }
   }

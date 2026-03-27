@@ -31,18 +31,18 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <div className="space-y-6 text-center">
-        <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-stone-100">
-          <Mail size={22} className="text-[#8B5E3C]" />
+        <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-[#C4704B]/10">
+          <Mail size={22} className="text-[#C4704B]" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-stone-800 tracking-tight">เช็คอีเมลของคุณ</h2>
-          <p className="text-sm text-stone-500 leading-relaxed">
+          <h2 className="text-xl font-semibold text-[#3D3630] tracking-tight">เช็คอีเมลของคุณ</h2>
+          <p className="text-sm text-[#7A7067] leading-relaxed">
             หากอีเมลนี้มีอยู่ในระบบ เราจะส่งลิงก์รีเซ็ตรหัสผ่านให้ภายในไม่กี่นาที
           </p>
         </div>
         <Link
           href="/login"
-          className="inline-flex items-center gap-2 text-sm text-[#8B5E3C] hover:underline"
+          className="inline-flex items-center gap-2 text-sm text-[#C4704B] hover:underline"
         >
           <ArrowLeft size={14} />
           กลับไปหน้าเข้าสู่ระบบ
@@ -54,13 +54,13 @@ export default function ForgotPasswordPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h2 className="text-2xl font-semibold text-stone-800 tracking-tight">ลืมรหัสผ่าน</h2>
-        <p className="text-sm text-stone-500">กรอกอีเมลของคุณ แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ให้</p>
+        <h2 className="text-2xl font-semibold text-[#3D3630] tracking-tight">ลืมรหัสผ่าน</h2>
+        <p className="text-sm text-[#7A7067]">กรอกอีเมลของคุณ แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ให้</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-stone-700">
+          <label htmlFor="email" className="text-sm font-medium text-[#3D3630]">
             อีเมล
           </label>
           <input
@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-[#8B5E3C] focus:border-[#8B5E3C] transition"
+            className="w-full px-3 py-2.5 rounded-lg border border-[#E8E0D5] bg-white text-sm text-[#3D3630] placeholder:text-[#9A9179] focus:outline-none focus:ring-1 focus:ring-[#C4704B] focus:border-[#C4704B] transition"
           />
           {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
         </div>
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#8B5E3C] text-white text-sm font-medium rounded-lg hover:bg-[#724C30] transition-colors disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#C4704B] text-white text-sm font-medium rounded-lg hover:bg-[#A85A3A] transition-colors disabled:opacity-60"
         >
           {isSubmitting && <Loader2 size={15} className="animate-spin" />}
           ส่งลิงก์รีเซ็ตรหัสผ่าน
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
 
       <Link
         href="/login"
-        className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700 transition-colors"
+        className="flex items-center gap-1.5 text-sm text-[#7A7067] hover:text-[#3D3630] transition-colors"
       >
         <ArrowLeft size={14} />
         กลับไปหน้าเข้าสู่ระบบ
