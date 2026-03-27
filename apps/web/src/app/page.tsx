@@ -1,7 +1,29 @@
-export default function LandingPage() {
-  return (
-    <main className="min-h-screen bg-[#FAFAF9] flex items-center justify-center">
-      <h1 className="text-stone-800 text-xl font-medium tracking-tight">LinguaQuest</h1>
-    </main>
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+export default async function LandingPage() {
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    String(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    String(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll() {},
+      },
+    }
   )
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    redirect('/companion')
+  } else {
+    redirect('/login')
+  }
 }

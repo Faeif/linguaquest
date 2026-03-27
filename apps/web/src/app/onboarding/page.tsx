@@ -1,10 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { OnboardingForm } from '@/components/onboarding/OnboardingForm'
 
-import { AppShell } from '@/components/layout/app-shell'
-
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function OnboardingPage() {
   const cookieStore = await cookies()
   const supabase = createServerClient(
     String(process.env.NEXT_PUBLIC_SUPABASE_URL),
@@ -14,30 +13,35 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         getAll() {
           return cookieStore.getAll()
         },
-        setAll() {},
+        setAll(cookiesToSet) {
+          for (const { name, value, options } of cookiesToSet) {
+            cookieStore.set(name, value, options)
+          }
+        },
       },
     }
   )
+
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  // Guard: Not logged in
+  if (authError || !user) {
     redirect('/login')
   }
 
-  // Fetch profile for display name and avatar
+  // Guard: Already onboarded?
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, avatar_url')
+    .select('onboarding_completed')
     .eq('id', user.id)
     .single()
 
-  const userData = {
-    display_name: profile?.display_name,
-    avatar_url: profile?.avatar_url,
-    email: user.email
+  if (profile?.onboarding_completed) {
+    redirect('/companion')
   }
 
-  return <AppShell user={userData}>{children}</AppShell>
+  return <OnboardingForm />
 }
