@@ -20,7 +20,7 @@ Do NOT load everything. Only load the specific `@rule` file you need for the cur
 1. **Types:** `const data: ExpectedType = response` (NO `any`, NO `@ts-ignore`)
 2. **Database:** EVERY new table MUST have an RLS policy.
 3. **Zod:** Define globally in `packages/db/src/schemas/`, use everywhere.
-4. **Security:** `process.env.GEMINI_API_KEY!` (NEVER hardcode secrets).
+4. **Security:** `process.env.DEEPSEEK_API_KEY!` (NEVER hardcode secrets).
 5. **UI Logic:** NO direct DB queries or heavy business logic in React components! Use `TanStack Query` and `packages/core`.
 
 ## 🔄 Workflow
