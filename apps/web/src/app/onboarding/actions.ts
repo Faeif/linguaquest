@@ -68,8 +68,8 @@ export async function submitOnboarding(data: OnboardingInput) {
       // Non-fatal error, the main profile is saved.
     }
 
-    // 6. Revalidate the home path where progress is shown
-    revalidatePath('/home')
+    // 6. Revalidate the companion path
+    revalidatePath('/companion')
 
     return { success: true }
   } catch (err) {

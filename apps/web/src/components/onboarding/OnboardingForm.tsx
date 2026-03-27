@@ -73,7 +73,7 @@ export function OnboardingForm() {
       setServerError(res.error || 'Something went wrong')
       return
     }
-    router.push('/home')
+    router.push('/companion')
   }
 
   // Common button styles

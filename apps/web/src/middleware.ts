@@ -40,9 +40,12 @@ export async function middleware(request: NextRequest) {
 
   const isProtectedPage =
     pathname.startsWith('/home') ||
-    pathname.startsWith('/learn') ||
-    pathname.startsWith('/battle') ||
-    pathname.startsWith('/community') ||
+    pathname.startsWith('/companion') ||
+    pathname.startsWith('/essay') ||
+    pathname.startsWith('/speaking') ||
+    pathname.startsWith('/flashcard') ||
+    pathname.startsWith('/reading') ||
+    pathname.startsWith('/marketplace') ||
     pathname.startsWith('/profile') ||
     pathname.startsWith('/onboarding')
 
@@ -56,7 +59,7 @@ export async function middleware(request: NextRequest) {
   // Redirect authenticated users away from auth pages
   if (user && isAuthPage) {
     const url = request.nextUrl.clone()
-    url.pathname = '/home'
+    url.pathname = '/companion'
     return NextResponse.redirect(url)
   }
 

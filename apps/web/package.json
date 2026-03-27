@@ -11,9 +11,11 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@sentry/nextjs": "^10.45.0",
+    "@serwist/next": "^9.5.7",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.100.0",
     "@tanstack/react-query": "^5.95.2",
+    "browser-image-compression": "^2.0.2",
     "lucide-react": "^1.7.0",
     "next": "15.5.14",
     "posthog-js": "^1.363.3",
@@ -31,6 +33,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.14",
+    "serwist": "^9.5.7",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

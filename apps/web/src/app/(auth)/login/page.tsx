@@ -3,18 +3,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { type LoginInput, LoginSchema } from '@/lib/schemas/auth'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState('')
   const [googleLoading, setGoogleLoading] = useState(false)
+
+  // Check for success/error messages from URL
+  const resetSuccess = searchParams.get('reset') === 'success'
+  const errorParam = searchParams.get('error')
 
   const {
     register,
@@ -26,15 +31,36 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginInput) {
     setServerError('')
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
     })
     if (error) {
+      if (error.message.includes('Email not confirmed')) {
+        // Redirect to verify email page
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+        return
+      }
       setServerError('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
       return
     }
-    router.push('/home')
+
+    // Check if user has completed onboarding
+    if (authData.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (!profile?.onboarding_completed) {
+        router.push('/onboarding')
+        router.refresh()
+        return
+      }
+    }
+
+    router.push('/companion')
     router.refresh()
   }
 
@@ -54,6 +80,18 @@ export default function LoginPage() {
         <h2 className="text-2xl font-semibold text-[#3D3630] tracking-tight">ยินดีต้อนรับกลับ</h2>
         <p className="text-sm text-[#7A7067]">เข้าสู่ระบบเพื่อเรียนต่อ</p>
       </div>
+
+      {resetSuccess && (
+        <div className="p-3 rounded-lg bg-green-50 border border-green-100 text-sm text-green-600">
+          รีเซ็ตรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่
+        </div>
+      )}
+
+      {errorParam && (
+        <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-600">
+          {decodeURIComponent(errorParam)}
+        </div>
+      )}
 
       {/* Google Login */}
       <button
@@ -146,6 +184,23 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-8">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold text-[#3D3630] tracking-tight">ยินดีต้อนรับกลับ</h2>
+            <p className="text-sm text-[#7A7067]">กำลังโหลด...</p>
+          </div>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   )
 }
 

@@ -7,6 +7,10 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/home'
 
+  // Debug: log incoming params
+  console.log('[auth/callback] code:', code ? 'present' : 'missing')
+  console.log('[auth/callback] searchParams:', Object.fromEntries(searchParams))
+
   if (code) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -28,25 +32,41 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error) {
-      // Check if user has completed onboarding
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', user.id)
-          .single()
-
-        if (!profile?.onboarding_completed) {
-          return NextResponse.redirect(`${origin}/onboarding`)
-        }
-      }
-      return NextResponse.redirect(`${origin}${next}`)
+    if (error) {
+      console.error('[auth/callback] exchangeCodeForSession error:', error.message)
+      return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`)
     }
+
+    // Check if user has completed onboarding
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single()
+
+      console.log('[auth/callback] user:', user.email, 'onboarding:', profile?.onboarding_completed)
+
+      if (!profile?.onboarding_completed) {
+        return NextResponse.redirect(`${origin}/onboarding`)
+      }
+    }
+
+    return NextResponse.redirect(`${origin}${next}`)
   }
 
+  // No code - check if this is an error from OAuth provider
+  const errorParam = searchParams.get('error')
+  const errorDesc = searchParams.get('error_description')
+  if (errorParam) {
+    console.error('[auth/callback] OAuth error:', errorParam, errorDesc)
+    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(errorDesc || errorParam)}`)
+  }
+
+  console.error('[auth/callback] No code provided')
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`)
 }

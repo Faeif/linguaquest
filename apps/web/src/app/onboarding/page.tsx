@@ -40,7 +40,7 @@ export default async function OnboardingPage() {
     .single()
 
   if (profile?.onboarding_completed) {
-    redirect('/home')
+    redirect('/companion')
   }
 
   return <OnboardingForm />

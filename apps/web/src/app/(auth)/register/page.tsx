@@ -13,7 +13,7 @@ function PasswordStrength({ password }: { password: string }) {
   const checks = [
     { label: '8 ตัวอักษรขึ้นไป', ok: password.length >= 8 },
     { label: 'ตัวพิมพ์ใหญ่', ok: /[A-Z]/.test(password) },
-    { label: 'อักขระพิเศษ', ok: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
+    { label: 'อักขระพิเศษ', ok: /[!@#$%^&*(),.?\":{}|<>]/.test(password) },
   ]
   if (!password) return null
   return (
@@ -57,16 +57,20 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
-      options: { data: { display_name: data.name } },
+      options: {
+        data: { name: data.name },
+        emailRedirectTo: `${location.origin}/auth/callback`,
+      },
     })
     if (error) {
       setServerError(
         error.message === 'User already registered'
           ? 'อีเมลนี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ'
-          : 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'
+          : `เกิดข้อผิดพลาด: ${error.message}`
       )
       return
     }
+    // Redirect to OTP verification page
     router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
   }
 
