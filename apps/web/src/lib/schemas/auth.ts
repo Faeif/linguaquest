@@ -13,7 +13,7 @@ export const RegisterSchema = z
     password: passwordSchema,
     confirmPassword: z.string(),
     acceptTerms: z.literal(true, {
-      errorMap: () => ({ message: 'กรุณายอมรับข้อตกลงการใช้งานก่อนดำเนินการต่อ' }),
+      error: 'กรุณายอมรับข้อตกลงการใช้งานก่อนดำเนินการต่อ',
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {

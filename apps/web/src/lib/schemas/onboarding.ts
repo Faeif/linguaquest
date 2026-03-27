@@ -21,13 +21,13 @@ export const LEARNING_GOALS = [
 
 export const OnboardingSchema = z.object({
   learningGoal: z.enum(LEARNING_GOALS, {
-    errorMap: () => ({ message: 'กรุณาเลือกเป้าหมายการเรียน' }),
+    error: 'กรุณาเลือกเป้าหมายการเรียน',
   }),
   hskSelfAssessed: z.enum(HSK_LEVELS, {
-    errorMap: () => ({ message: 'กรุณาเลือกระดับ HSK ปัจจุบันของคุณ' }),
+    error: 'กรุณาเลือกระดับ HSK ปัจจุบันของคุณ',
   }),
   dailyGoalMinutes: z
-    .number({ invalid_type_error: 'ต้องเป็นตัวเลข' })
+    .number({ error: 'ต้องเป็นตัวเลข' })
     .min(5, 'เป้าหมายรายวันต้องอย่างน้อย 5 นาที')
     .max(120, 'เพื่อไม่ให้หนักเกินไป แนะนำไม่เกิน 120 นาทีต่อวัน'),
 })
