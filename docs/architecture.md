@@ -106,8 +106,10 @@ packages/db depends on:
                                            │
     ┌──────────────────────────────────────▼─┐
     │              AI Services               │
-    │  Gemini Flash/Pro (Text AI)            │
-    │  Azure Speech (STT+TTS+Pronunciation)  │
+    │  DeepSeek V3.2 (Chinese Specialist)    │
+    │  Qwen3 (Thai Explainer)                │
+    │  Qwen3-ASR (Speech-to-Text)            │
+    │  SpeechSuper (Tone/Pronunciation)      │
     └────────────────────────────────────────┘
 ```
 
@@ -129,44 +131,58 @@ import { createAdminSupabase } from '@/lib/supabase/server'
 // ⚠️ Only use in background jobs and webhooks
 ```
 
-### Gemini AI
+### DeepSeek (Chinese Specialist)
 ```typescript
-// packages/core/ai/gemini.ts
-import { GoogleGenerativeAI } from '@google/generative-ai'
+// packages/core/ai/deepseek.ts
+import { createOpenAI } from '@ai-sdk/openai'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
-export const flashModel = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash-exp',
-  generationConfig: {
-    temperature: 0.7,
-    maxOutputTokens: 1000,
-  },
+export const deepseek = createOpenAI({
+  baseURL: 'https://api.deepseek.com',
+  apiKey: process.env.DEEPSEEK_API_KEY!,
 })
 
-export const proModel = genAI.getGenerativeModel({
-  model: 'gemini-2.0-pro-exp',
-  generationConfig: {
-    temperature: 0.3, // Lower for essay grading accuracy
-    maxOutputTokens: 2000,
-  },
+// Use for: Card generation, AI Companion chat, Essay grading, Grammar analysis
+export const chineseModel = deepseek('deepseek-chat', {
+  // DeepSeek V3.2 - excellent at Chinese parsing
 })
 ```
 
-### Azure Speech
+### Qwen3 (Thai Explainer)
 ```typescript
-// packages/core/ai/azure-speech.ts
-import * as sdk from 'microsoft-cognitiveservices-speech-sdk'
+// packages/core/ai/qwen.ts
+import { createOpenAI } from '@ai-sdk/openai'
 
-export function createSpeechConfig() {
-  const config = sdk.SpeechConfig.fromSubscription(
-    process.env.AZURE_SPEECH_KEY!,
-    process.env.AZURE_SPEECH_REGION!
-  )
-  config.speechRecognitionLanguage = 'en-US'
-  config.speechSynthesisLanguage = 'en-US'
-  config.speechSynthesisVoiceName = 'en-US-AriaNeural' // Natural voice
-  return config
+export const qwen = createOpenAI({
+  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  apiKey: process.env.ALIBABA_CLOUD_API_KEY!,
+})
+
+// Use for: Translating feedback to Thai, explaining grammar in Thai
+export const thaiModel = qwen('qwen-max', {
+  // Qwen3 with thinking OFF for fast responses
+})
+```
+
+### SpeechSuper (Pronunciation Assessment)
+```typescript
+// packages/core/ai/speechsuper.ts
+// Use for: Tone assessment, phoneme-level pronunciation scoring
+
+export async function assessPronunciation(audio: Blob, refText: string) {
+  const formData = new FormData()
+  formData.append('audio', audio)
+  formData.append('refText', refText)
+  formData.append('coreType', 'cn.word.eval') // Chinese word evaluation
+
+  const response = await fetch('https://api.speechsuper.com/v1/eval', {
+    method: 'POST',
+    headers: {
+      'X-App-Key': process.env.SPEECHSUPER_APP_KEY!,
+      'X-App-Secret': process.env.SPEECHSUPER_SECRET_KEY!,
+    },
+    body: formData,
+  })
+  return response.json()
 }
 ```
 

@@ -6,17 +6,23 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.48",
+    "@hookform/resolvers": "^5.2.2",
     "@sentry/nextjs": "^10.45.0",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.100.0",
     "@tanstack/react-query": "^5.95.2",
+    "ai": "^6.0.140",
+    "lucide-react": "^1.7.0",
     "next": "15.5.14",
     "posthog-js": "^1.363.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-hook-form": "^7.72.0",
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
   },
