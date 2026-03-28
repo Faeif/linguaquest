@@ -1,6 +1,16 @@
 'use client'
 
-import { BookOpen, MessageSquare, Mic, PanelLeft, PanelLeftClose, ShoppingBag, Sparkles, User } from 'lucide-react'
+import {
+  BookOpen,
+  FileText,
+  MessageSquare,
+  Mic,
+  PanelLeft,
+  PanelLeftClose,
+  ShoppingBag,
+  Sparkles,
+  User,
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -10,11 +20,16 @@ import { DesktopUserMenu } from './DesktopUserMenu'
 const mainNav = [
   { href: '/companion', icon: MessageSquare, label: 'Speak' },
   { href: '/flashcard', icon: BookOpen, label: 'Vocab' },
-  { href: '/marketplace', icon: ShoppingBag, label: 'Community' },
+  { href: '/exam', icon: FileText, label: 'Exam' },
+  { href: '/community', icon: ShoppingBag, label: 'Community' },
   { href: '/profile', icon: User, label: 'Profile' },
 ]
 
-export function Sidebar({ user }: { user?: { display_name?: string | null; avatar_url?: string | null; email?: string } }) {
+export function Sidebar({
+  user,
+}: {
+  user?: { display_name?: string | null; avatar_url?: string | null; email?: string }
+}) {
   const pathname = usePathname()
   const [isExpanded, setIsExpanded] = useState(true)
 
@@ -25,17 +40,33 @@ export function Sidebar({ user }: { user?: { display_name?: string | null; avata
   return (
     <>
       {/* 💻 Desktop Sidebar (Hidden on Mobile) */}
-      <aside 
+      <aside
         className={`hidden lg:flex flex-col h-screen sticky top-0 bg-[#FFFEFB] border-r border-[#E8E0D5] p-3 shrink-0 transition-all duration-300 ease-in-out ${
           isExpanded ? 'w-64' : 'w-20 items-center'
         }`}
       >
-        <div className={`flex items-center mb-6 px-2 py-3 ${isExpanded ? 'justify-between' : 'justify-center flex-col gap-4'}`}>
-          <Link href="/companion" className={`flex items-center gap-2.5 ${!isExpanded && 'justify-center'}`}>
-            <Image src="/icons/icon-192x192.png" alt="LQ Logo" width={32} height={32} className="rounded-lg shadow-sm" />
-            {isExpanded && <span className="font-bold tracking-tight text-[#3D3630] text-lg whitespace-nowrap overflow-hidden">LinguaQuest</span>}
+        <div
+          className={`flex items-center mb-6 px-2 py-3 ${isExpanded ? 'justify-between' : 'justify-center flex-col gap-4'}`}
+        >
+          <Link
+            href="/companion"
+            className={`flex items-center gap-2.5 ${!isExpanded && 'justify-center'}`}
+          >
+            <Image
+              src="/icons/icon-192x192.png"
+              alt="LQ Logo"
+              width={32}
+              height={32}
+              className="rounded-lg shadow-sm"
+            />
+            {isExpanded && (
+              <span className="font-bold tracking-tight text-[#3D3630] text-lg whitespace-nowrap overflow-hidden">
+                LinguaQuest
+              </span>
+            )}
           </Link>
-          <button 
+          <button
+            type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-1.5 text-[#9A9179] hover:text-[#3D3630] hover:bg-[#E8E0D5]/50 rounded-lg transition-colors"
           >
@@ -65,7 +96,9 @@ export function Sidebar({ user }: { user?: { display_name?: string | null; avata
         </nav>
 
         {/* Secondary Links (Only on Desktop - Hidden if collapsed) */}
-        <div className={`mt-8 mb-4 w-full transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}>
+        <div
+          className={`mt-8 mb-4 w-full transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0 hidden'}`}
+        >
           <p className="px-3 py-2 text-[10px] font-bold text-[#9A9179] uppercase tracking-wider">
             พิเศษ
           </p>
@@ -86,7 +119,7 @@ export function Sidebar({ user }: { user?: { display_name?: string | null; avata
             </Link>
           </nav>
         </div>
-        
+
         <DesktopUserMenu user={user} isSidebarExpanded={isExpanded} />
       </aside>
 
