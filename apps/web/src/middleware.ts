@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/flashcard') ||
     pathname.startsWith('/reading') ||
     pathname.startsWith('/exam') ||
-    pathname.startsWith('/marketplace') ||
+    pathname.startsWith('/community') ||
     pathname.startsWith('/profile') ||
     pathname.startsWith('/onboarding')
 

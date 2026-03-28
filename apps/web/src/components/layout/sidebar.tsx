@@ -21,7 +21,7 @@ const mainNav = [
   { href: '/companion', icon: MessageSquare, label: 'Speak' },
   { href: '/flashcard', icon: BookOpen, label: 'Vocab' },
   { href: '/exam', icon: FileText, label: 'Exam' },
-  { href: '/marketplace', icon: ShoppingBag, label: 'Community' },
+  { href: '/community', icon: ShoppingBag, label: 'Community' },
   { href: '/profile', icon: User, label: 'Profile' },
 ]
 
