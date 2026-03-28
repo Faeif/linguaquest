@@ -1,10 +1,19 @@
 {
-  "permissions": {
-    "allow": ["Bash(pnpm:*)", "Bash(git log:*)", "Bash(git diff:*)", "Bash(supabase:*)"],
-    "deny": ["Bash(rm -rf:*)", "Bash(git push --force:*)"]
-  },
-  "model": "claude-opus-4-5",
   "env": {
     "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5"
-  }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(pnpm:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(supabase:*)",
+      "Bash(psql \"postgresql://postgres:postgres@localhost:54322/postgres\" -f \"/Volumes/Extreme SSD/Ai preneur South!!!/linguaquest/supabase/migrations/20260329000000_fix_global_cards_and_progress.sql\")",
+      "Bash(docker exec:*)",
+      "Bash(SUPABASE_DB_URL=\"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" supabase gen types typescript --local)",
+      "Bash(grep -n '`' \"/Volumes/Extreme SSD/Ai preneur South!!!/linguaquest/.env.local\")"
+    ],
+    "deny": ["Bash(rm -rf:*)", "Bash(git push --force:*)"]
+  },
+  "model": "claude-opus-4-5"
 }

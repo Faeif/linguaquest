@@ -8,6 +8,12 @@ const withSerwist = withSerwistInit({
 })
 
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    '@linguaquest/db',
+    '@linguaquest/core',
+    '@linguaquest/utils',
+    'simple-ts-fsrs',
+  ],
   images: {
     remotePatterns: [
       {
