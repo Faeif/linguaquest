@@ -155,11 +155,12 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as {
       audio?: string
+      mimeType?: string
       referenceText?: string
       pinyin?: string
       language?: string
     }
-    const { audio, referenceText, pinyin, language = 'zh-CN' } = body
+    const { audio, mimeType = 'audio/wav', referenceText, pinyin, language = 'zh-CN' } = body
 
     const azureKey = process.env.AZURE_SPEECH_KEY
     const azureRegion = process.env.AZURE_SPEECH_REGION
@@ -191,7 +192,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Ocp-Apim-Subscription-Key': azureKey,
-        'Content-Type': 'audio/webm;codecs=opus',
+        'Content-Type': mimeType,
         'Pronunciation-Assessment': paHeader,
       },
       body: audioBuffer,

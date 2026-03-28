@@ -91,6 +91,55 @@ function getBestMimeType(): string {
   return ''
 }
 
+// ─── WAV encoder ──────────────────────────────────────────────────────────────
+// Azure Speech REST API works most reliably with WAV PCM 16kHz mono.
+// We decode whatever MediaRecorder captured (WebM/OGG/MP4) via AudioContext,
+// resample to 16 kHz mono, then encode as a proper WAV file.
+
+function encodeWav(samples: Float32Array, sampleRate: number): Blob {
+  const dataLen = samples.length * 2 // 16-bit PCM
+  const buf = new ArrayBuffer(44 + dataLen)
+  const view = new DataView(buf)
+  const str = (off: number, s: string) => {
+    for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i))
+  }
+  str(0, 'RIFF')
+  view.setUint32(4, 36 + dataLen, true)
+  str(8, 'WAVE')
+  str(12, 'fmt ')
+  view.setUint32(16, 16, true) // chunk size
+  view.setUint16(20, 1, true) // PCM
+  view.setUint16(22, 1, true) // mono
+  view.setUint32(24, sampleRate, true)
+  view.setUint32(28, sampleRate * 2, true) // byte rate
+  view.setUint16(32, 2, true) // block align
+  view.setUint16(34, 16, true) // bits per sample
+  str(36, 'data')
+  view.setUint32(40, dataLen, true)
+  let off = 44
+  for (const s of samples) {
+    const c = Math.max(-1, Math.min(1, s))
+    view.setInt16(off, c < 0 ? c * 0x8000 : c * 0x7fff, true)
+    off += 2
+  }
+  return new Blob([buf], { type: 'audio/wav' })
+}
+
+async function toWav(blob: Blob, targetRate = 16000): Promise<Blob> {
+  const arrayBuf = await blob.arrayBuffer()
+  const audioCtx = new AudioContext()
+  const decoded = await audioCtx.decodeAudioData(arrayBuf)
+  await audioCtx.close()
+  const sampleCount = Math.ceil(decoded.duration * targetRate)
+  const offline = new OfflineAudioContext(1, sampleCount, targetRate)
+  const src = offline.createBufferSource()
+  src.buffer = decoded
+  src.connect(offline.destination)
+  src.start()
+  const rendered = await offline.startRendering()
+  return encodeWav(rendered.getChannelData(0), targetRate)
+}
+
 // ─── Syllable breakdown table ─────────────────────────────────────────────────
 
 function SyllableTable({ syl, idx }: { syl: SyllableResult; idx: number }) {
@@ -200,15 +249,17 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
         setState('analyzing')
 
         try {
-          const blob = new Blob(chunksRef.current, { type: mimeType })
+          const rawBlob = new Blob(chunksRef.current, { type: mimeType })
 
-          if (blob.size === 0) {
+          if (rawBlob.size === 0) {
             setErrorMsg('ไม่ได้รับเสียง — กรุณากดค้างแล้วพูด แล้วกดหยุด')
             setState('error')
             return
           }
 
-          const base64 = await blobToBase64(blob)
+          // Convert to WAV PCM 16 kHz — Azure's most reliable input format
+          const wavBlob = await toWav(rawBlob)
+          const base64 = await blobToBase64(wavBlob)
 
           if (!base64) {
             setErrorMsg('แปลงเสียงไม่สำเร็จ — ลองอีกครั้ง')
@@ -221,6 +272,7 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               audio: base64,
+              mimeType: 'audio/wav',
               referenceText: word,
               pinyin,
               language: 'zh-CN',
