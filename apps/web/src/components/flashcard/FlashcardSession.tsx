@@ -12,7 +12,7 @@ export type ExtendedFlashcard = FlashCard & {
   hanzi: string
   thai_meaning: string
   pinyin: string
-  tones: string[]
+  tones: number[]
   audio_url?: string
   english_meaning?: string
 }
