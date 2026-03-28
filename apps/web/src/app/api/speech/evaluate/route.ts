@@ -229,8 +229,22 @@ export async function POST(req: NextRequest) {
     // ── Parse overall scores ───────────────────────────────────────────────
     const nBest = raw.NBest?.[0]
     const pa = nBest?.PronunciationAssessment
-    const recognized = nBest?.ITN ?? nBest?.Lexical ?? raw.DisplayText ?? ''
+    const rawRecognized = nBest?.ITN ?? nBest?.Lexical ?? raw.DisplayText ?? ''
+    // Strip all punctuation (Chinese + ASCII) then trim
+    const recognized = rawRecognized.replace(/[。，！？、.,!?;:]/g, '').trim()
     const words = nBest?.Words ?? []
+
+    // ── If Azure heard only noise / punctuation → treat as no-match ───────
+    if (!recognized && words.length === 0) {
+      return NextResponse.json({
+        score: 0,
+        accuracyScore: 0,
+        fluencyScore: 0,
+        completenessScore: 0,
+        recognized: '',
+        syllables: [],
+      })
+    }
 
     // ── Parse expected pinyin ──────────────────────────────────────────────
     const pinyinSyllables = pinyin ? pinyin.split(/\s+/).map(parsePinyinSyllable) : []
@@ -292,7 +306,7 @@ export async function POST(req: NextRequest) {
       accuracyScore: Math.round(pa?.AccuracyScore ?? 0),
       fluencyScore: Math.round(pa?.FluencyScore ?? 0),
       completenessScore: Math.round(pa?.CompletenessScore ?? 0),
-      recognized: recognized.replace(/[。，！？、]/g, '').trim(),
+      recognized,
       syllables,
     })
   } catch (err) {

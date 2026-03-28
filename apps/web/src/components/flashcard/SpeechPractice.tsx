@@ -345,16 +345,16 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
           <div className="flex items-center gap-2 px-2.5 py-1.5 bg-[#FFFEFB] border border-[#E8E0D5] rounded-lg">
             <span className="text-[10px] text-[#9A9179] shrink-0">Azure ได้ยิน</span>
             <span className="font-semibold text-[#2C2824] text-sm flex-1">
-              {result.recognized || '(ไม่ได้ยิน)'}
+              {result.recognized || '—'}
             </span>
-            {result.recognized?.trim() === word ? (
+            {result.recognized && result.recognized.trim() === word ? (
               <span className="text-[#6B7F5E] text-xs font-semibold shrink-0">✓ ตรง</span>
-            ) : (
+            ) : result.recognized ? (
               <span className="text-[#B56B6B] text-xs font-semibold shrink-0">✗ ไม่ตรง</span>
-            )}
+            ) : null}
           </div>
 
-          {/* Per-syllable breakdown */}
+          {/* Per-syllable breakdown — always show table, never bars */}
           {result.syllables.length > 0 ? (
             <div className="bg-[#FFFEFB] border border-[#E8E0D5] rounded-lg px-3 py-2.5 space-y-1">
               {result.syllables.map((syl, i) => (
@@ -363,27 +363,10 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
               ))}
             </div>
           ) : (
-            /* Fallback: show overall bars if no syllable detail */
-            <div className="space-y-1.5 bg-[#FFFEFB] border border-[#E8E0D5] rounded-lg px-3 py-2.5">
-              {[
-                { label: 'ความถูกต้อง', score: result.accuracyScore },
-                { label: 'ความลื่นไหล', score: result.fluencyScore },
-                { label: 'ครบถ้วน', score: result.completenessScore },
-              ].map(({ label, score }) => (
-                <div
-                  key={label}
-                  className="grid grid-cols-[5.5rem_1fr_2rem] items-center gap-x-2 text-xs"
-                >
-                  <span className="text-[#9A9179]">{label}</span>
-                  <div className="h-1.5 bg-[#E8E0D5] rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${score}%`, backgroundColor: scoreColor(score) }}
-                    />
-                  </div>
-                  <ScoreChip score={score} />
-                </div>
-              ))}
+            /* No syllable data: Azure didn't hear clearly */
+            <div className="flex flex-col items-center gap-1.5 py-3 bg-[#FFFEFB] border border-[#E8E0D5] rounded-lg">
+              <p className="text-xs text-[#B56B6B] font-medium">ไม่ได้ยินเสียงชัดเจน</p>
+              <p className="text-[10px] text-[#9A9179]">พูดใกล้ไมค์มากขึ้น แล้วออกเสียงให้ชัด</p>
             </div>
           )}
 
