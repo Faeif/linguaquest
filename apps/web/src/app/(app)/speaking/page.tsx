@@ -14,8 +14,7 @@ export default function SpeakingPage() {
         </div>
         <h2 className="text-lg font-medium text-[#3D3630] mb-2">Coming Soon</h2>
         <p className="text-sm text-[#7A7067] max-w-md mx-auto">
-          พูดภาษาจีนแล้วให้ AI วิเคราะห์การออกเสียง โทนเสียง (声调)
-          พร้อมให้คะแนนและแนะนำวิธีปรับปรุง
+          พูดภาษาจีนแล้วให้ AI วิเคราะห์การออกเสียง โทนเสียง (声调) พร้อมให้คะแนนและแนะนำวิธีปรับปรุง
         </p>
       </div>
     </div>

@@ -1,3 +1,5 @@
+'use client'
+
 import { WifiOff } from 'lucide-react'
 import Link from 'next/link'
 
@@ -12,9 +14,10 @@ export default function OfflinePage() {
         ดูเหมือนว่าคุณกำลังไม่ได้เชื่อมต่ออินเทอร์เน็ตอยู่ ฟีเจอร์ AI จะไม่สามารถใช้งานได้ในตอนนี้
         แต่คุณสามารถทบทวนคำศัพท์ที่โหลดไว้แล้วได้
       </p>
-      
+
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <button
+          type="button"
           onClick={() => window.location.reload()}
           className="w-full py-3 bg-[#C4704B] text-white rounded-xl font-medium hover:bg-[#A65E3E] transition-colors"
         >

@@ -1,0 +1,109 @@
+### 🌟 Basic Features
+The Pronunciation Assessment API (scripted) provided by SpeechSuper offers a comprehensive analysis of learners' audio recordings, providing valuable insights in the following areas:
+- Accurate assessment at phoneme, syllable, word, and sentence levels, aligning with native English speech patterns.
+- Fluency metrics, including words correct per minute and pause count, alongside IELTS/PTE score estimation.
+Basic Features:
+- Pronunciation score (of phonemes, words, sentences)
+- Fluency score
+- Completeness score
+- Rhythm score or speed
+
+### 🪐 Highlight Features
+Explore advanced capabilities with SpeechSuper's Pronunciation Assessment API, complementing its fundamental features. Unleash the power of:
+- Syllable stress analysis
+- Liaison detection
+- Loss of plosion identification
+- Rising/falling tone analysis for sentence endings
+- Real-time feedback at the sentence level
+- Detection of phoneme-level mispronunciations (insertion, deletion, substitution)
+With SpeechSuper's Pronunciation Assessment API, you access robust tools to evaluate and refine your pronunciation skills within structured contexts. Elevate your language proficiency with precise analysis and instant feedback mechanisms.
+- English
+- Chinese
+- German
+- French
+- Russian
+- Korean
+- Japanese
+- Spanish
+- more to come
+- Java
+- C/C++
+- Swift
+- golang
+- php
+- C#
+- Unity
+- Javascript
+- Objective-C
+- Python
+- Node
+- Rust
+- etc
+- iOS
+- Android
+- Web
+- Windows
+- MacOS
+- Linux
+- etc
+
+### 🚀 Getting Started
+1. Get the appKey and secretKey.
+
+```
+appKey
+```
+
+
+```
+secretKey
+```
+
+If you don't have the keys, please go to [SpeechSuper](https://www.speechsuper.com/), and click "Contact us" to fill in the sheet. We will get in touch with you very soon!
+1. Git clone this project to your local.
+
+```
+git clone https://github.com/speechsuper/speechsuper-api-samples.git
+```
+
+
+```
+git clone https://github.com/speechsuper/speechsuper-api-samples.git
+```
+
+1. Choose the example of your interest.
+We have [http](https://github.com/speechsuper/speechsuper-api-samples/tree/main/http_samples) / [websocket](https://github.com/speechsuper/speechsuper-api-samples/tree/main/websocket_samples) examples in multiple coding languages. Fill in your appKey and secretKey:
+
+```
+appKey
+```
+
+
+```
+secretKey
+```
+
+
+```
+appKey = "Insert your appKey here" secretKey = "Insert your secretKey here"
+```
+
+
+```
+appKey = "Insert your appKey here" secretKey = "Insert your secretKey here"
+```
+
+1. Change the inputs according to your needs.
+
+```
+coreType = "sent.eval.promax" // sentence evaluation refText = "The successful warrior is the average man with laser-like focus." // reference text audioPath = "The audio path of the spoken sentence." audioType = "wav"
+```
+
+
+```
+coreType = "sent.eval.promax" // sentence evaluation refText = "The successful warrior is the average man with laser-like focus." // reference text audioPath = "The audio path of the spoken sentence." audioType = "wav"
+```
+
+Notes on Audio: SpeechSuper supports most audio formats, such as wav, mp3, opus, ogg, and amr.
+To optimize file size and enhance performance, we strongly recommend recording your audio at the following settings:
+1. Launch 🚀 your code and get the result.

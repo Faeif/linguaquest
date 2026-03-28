@@ -12,7 +12,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Left Panel: Branding & Value Proposition (Hidden on mobile) */}
       <div className="hidden lg:flex flex-col justify-between bg-[#C4704B] text-white p-12">
         <div className="flex items-center gap-3">
-          <Image src="/icons/icon-192x192.png" alt="LQ Logo" width={36} height={36} className="rounded-xl shadow-lg border border-white/20" />
+          <Image
+            src="/icons/icon-192x192.png"
+            alt="LQ Logo"
+            width={36}
+            height={36}
+            className="rounded-xl shadow-lg border border-white/20"
+          />
           <span className="font-bold tracking-tight text-xl">LinguaQuest</span>
         </div>
 
@@ -32,12 +38,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="flex-1 flex items-center justify-center py-10 opacity-90 hover:opacity-100 transition-opacity">
-          <Image 
-            src="/icons/icon-512x512.png" 
-            alt="LinguaQuest Mascot" 
-            width={340} 
-            height={340} 
-            className="rounded-3xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500 saturate-150" 
+          <Image
+            src="/icons/icon-512x512.png"
+            alt="LinguaQuest Mascot"
+            width={340}
+            height={340}
+            className="rounded-3xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500 saturate-150"
             priority
           />
         </div>
@@ -51,7 +57,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="flex flex-col items-center justify-center p-6 sm:p-12 h-screen overflow-y-auto">
         {/* Mobile Logo (Visible only on mobile) */}
         <div className="lg:hidden w-full max-w-[400px] mb-8 flex items-center gap-3">
-          <Image src="/icons/icon-192x192.png" alt="LQ Logo" width={36} height={36} className="rounded-xl shadow-md border border-[#E8E0D5]" />
+          <Image
+            src="/icons/icon-192x192.png"
+            alt="LQ Logo"
+            width={36}
+            height={36}
+            className="rounded-xl shadow-md border border-[#E8E0D5]"
+          />
           <span className="font-bold tracking-tight text-xl text-[#3D3630]">LinguaQuest</span>
         </div>
 

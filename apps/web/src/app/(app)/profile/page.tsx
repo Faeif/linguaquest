@@ -1,10 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
-import { BarChart2, Brain, Flame, Timer, LogOut, Bell, Shield, Sparkles, AlertCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  BarChart2,
+  Bell,
+  Brain,
+  Flame,
+  LogOut,
+  Shield,
+  Sparkles,
+  Timer,
+} from 'lucide-react'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { EditProfileModal } from '@/components/profile/EditProfileModal'
 import { signOutAction } from '@/app/actions/auth'
+import { EditProfileModal } from '@/components/profile/EditProfileModal'
 
 export default async function ProfilePage() {
   const cookieStore = await cookies()
@@ -40,11 +50,13 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 pb-20 lg:pb-0">
       {/* User Header & Edit Modal Component */}
-      <EditProfileModal user={{
-        display_name: profile?.display_name,
-        avatar_url: profile?.avatar_url,
-        email: profile?.email || user.email
-      }} />
+      <EditProfileModal
+        user={{
+          display_name: profile?.display_name,
+          avatar_url: profile?.avatar_url,
+          email: profile?.email || user.email,
+        }}
+      />
 
       {/* Main Stats (Top Row) */}
       <div className="grid grid-cols-3 gap-3">
@@ -125,7 +137,9 @@ export default async function ProfilePage() {
           <div className="w-8 h-8 rounded-lg bg-[#9A9179]/10 flex items-center justify-center">
             <Shield size={18} className="text-[#9A9179]" />
           </div>
-          <span className="text-sm font-medium text-[#3D3630] flex-1">Policies (Privacy & ToS)</span>
+          <span className="text-sm font-medium text-[#3D3630] flex-1">
+            Policies (Privacy & ToS)
+          </span>
         </button>
         <button className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]">
           <div className="w-8 h-8 rounded-lg bg-[#9A9179]/10 flex items-center justify-center">
@@ -134,7 +148,10 @@ export default async function ProfilePage() {
           <span className="text-sm font-medium text-[#3D3630] flex-1">Contact Support</span>
         </button>
         <form action={signOutAction} className="w-full">
-          <button type="submit" className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors">
+          <button
+            type="submit"
+            className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors"
+          >
             <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
               <LogOut size={18} className="text-red-500" />
             </div>
