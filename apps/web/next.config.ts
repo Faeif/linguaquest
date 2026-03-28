@@ -77,6 +77,7 @@ const nextConfig: NextConfig = {
     '@linguaquest/utils',
     'simple-ts-fsrs',
   ],
+  serverExternalPackages: ['require-in-the-middle'],
   images: {
     remotePatterns: [
       {

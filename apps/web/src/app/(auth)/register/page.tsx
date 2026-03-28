@@ -13,7 +13,7 @@ function PasswordStrength({ password }: { password: string }) {
   const checks = [
     { label: '8 ตัวอักษรขึ้นไป', ok: password.length >= 8 },
     { label: 'ตัวพิมพ์ใหญ่', ok: /[A-Z]/.test(password) },
-    { label: 'อักขระพิเศษ', ok: /[!@#$%^&*(),.?\":{}|<>]/.test(password) },
+    { label: 'อักขระพิเศษ', ok: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
   ]
   if (!password) return null
   return (

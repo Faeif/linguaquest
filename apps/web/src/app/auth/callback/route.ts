@@ -64,7 +64,9 @@ export async function GET(request: Request) {
   const errorDesc = searchParams.get('error_description')
   if (errorParam) {
     console.error('[auth/callback] OAuth error:', errorParam, errorDesc)
-    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(errorDesc || errorParam)}`)
+    return NextResponse.redirect(
+      `${origin}/login?error=${encodeURIComponent(errorDesc || errorParam)}`
+    )
   }
 
   console.error('[auth/callback] No code provided')

@@ -1,8 +1,8 @@
 'use server'
 
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 
 export async function updateProfileAction(formData: FormData) {
   const cookieStore = await cookies()
@@ -25,7 +25,10 @@ export async function updateProfileAction(formData: FormData) {
     }
   )
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
   if (authError || !user) throw new Error('Unauthorized')
 
   const displayName = formData.get('displayName') as string
@@ -37,7 +40,7 @@ export async function updateProfileAction(formData: FormData) {
   if (avatarFile && avatarFile.size > 0) {
     const fileExt = avatarFile.name.split('.').pop()
     const filePath = `${user.id}-${Date.now()}.${fileExt}`
-    
+
     // Upload standard file to Supabase via server (since client already compressed it)
     const { error: uploadError } = await supabase.storage
       .from('avatars')
@@ -52,10 +55,7 @@ export async function updateProfileAction(formData: FormData) {
   if (displayName) updates.display_name = displayName
 
   if (Object.keys(updates).length > 0) {
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id)
+    const { error } = await supabase.from('profiles').update(updates).eq('id', user.id)
 
     if (error) throw error
   }
