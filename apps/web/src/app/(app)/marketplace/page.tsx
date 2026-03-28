@@ -213,7 +213,7 @@ export default function CommunityPage() {
             </Link>
 
             <Link
-              href="/reading"
+              href="/exam"
               className="flex items-center justify-between rounded-2xl border border-[#E8E0D5] bg-[#FAF7F2] px-4 py-4 text-sm text-[#3D3630] transition-colors hover:bg-[#F4EEE5]"
             >
               <div>

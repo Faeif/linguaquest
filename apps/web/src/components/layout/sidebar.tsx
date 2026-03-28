@@ -20,7 +20,7 @@ import { DesktopUserMenu } from './DesktopUserMenu'
 const mainNav = [
   { href: '/companion', icon: MessageSquare, label: 'Speak' },
   { href: '/flashcard', icon: BookOpen, label: 'Vocab' },
-  { href: '/reading', icon: FileText, label: 'Exam' },
+  { href: '/exam', icon: FileText, label: 'Exam' },
   { href: '/marketplace', icon: ShoppingBag, label: 'Community' },
   { href: '/profile', icon: User, label: 'Profile' },
 ]
