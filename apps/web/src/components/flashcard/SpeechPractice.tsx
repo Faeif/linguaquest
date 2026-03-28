@@ -4,8 +4,11 @@
  * SpeechPractice — inline pronunciation scorer on the FlashCard back face.
  *
  * Flow: idle → recording → analyzing → done | error
- * Audio is recorded via MediaRecorder (webm/opus) and sent base64-encoded
- * to /api/speech/speechsuper which proxies to SpeechSuper word.eval.promax.
+ * Audio is recorded via MediaRecorder (webm/opus), sent base64-encoded to
+ * /api/speech/evaluate (Azure Cognitive Services Pronunciation Assessment).
+ *
+ * Azure returns: score, accuracyScore, fluencyScore, completenessScore,
+ * recognized (what Azure heard), phonemes[]
  */
 
 import { Mic, MicOff, RefreshCw } from 'lucide-react'
@@ -13,52 +16,31 @@ import { useCallback, useRef, useState } from 'react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface SyllableScore {
-  initial: string
-  final: string
-  tone: number
-  score: number
-  initialScore: number
-  finalScore: number
-  toneScore: number
-}
-
-interface SpeechResult {
-  overall: number
-  toneScore: number
-  initialScore: number
-  finalScore: number
-  syllables: SyllableScore[]
+interface AzureResult {
+  score: number // overall pronunciation score 0-100
+  accuracyScore: number // phoneme accuracy
+  fluencyScore: number // speech fluency / naturalness
+  completenessScore: number // % of words correctly spoken
+  recognized: string // what Azure heard
+  phonemes: Array<{ phoneme: string; score: number }>
 }
 
 type PracticeState = 'idle' | 'recording' | 'analyzing' | 'done' | 'error' | 'unsupported'
 
-// ─── Tone display ─────────────────────────────────────────────────────────────
-
-function toneSymbol(tone: number): string {
-  const map: Record<number, string> = {
-    1: '¯', // flat
-    2: '↗', // rising
-    3: '↘↗', // dipping
-    4: '↘', // falling
-    5: '·', // neutral
-  }
-  return map[tone] ?? '?'
-}
-
 // ─── Score bar ────────────────────────────────────────────────────────────────
 
-function ScoreBar({ score }: { score: number }) {
+function ScoreBar({ score, label }: { score: number; label: string }) {
   const color = score >= 80 ? '#6B7F5E' : score >= 60 ? '#C4704B' : '#B56B6B'
   return (
-    <div className="flex items-center gap-2 flex-1 min-w-0">
-      <div className="flex-1 h-1.5 bg-[#E8E0D5] rounded-full overflow-hidden">
+    <div className="grid grid-cols-[5.5rem_1fr_2rem] items-center gap-x-2 text-xs">
+      <span className="text-[#9A9179] truncate">{label}</span>
+      <div className="h-1.5 bg-[#E8E0D5] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700 ease-out"
           style={{ width: `${score}%`, backgroundColor: color }}
         />
       </div>
-      <span className="text-[11px] font-semibold w-7 text-right shrink-0" style={{ color }}>
+      <span className="text-right font-semibold text-[11px]" style={{ color }}>
         {score}
       </span>
     </div>
@@ -101,8 +83,8 @@ function getBestMimeType(): string {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface SpeechPracticeProps {
-  word: string // Chinese hanzi to pronounce
-  pinyin: string // pinyin hint shown to user
+  word: string // Chinese hanzi to pronounce e.g. "黄"
+  pinyin: string // pinyin shown as hint e.g. "huáng"
 }
 
 export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
@@ -111,7 +93,7 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
     if (!navigator.mediaDevices?.getUserMedia) return 'unsupported'
     return 'idle'
   })
-  const [result, setResult] = useState<SpeechResult | null>(null)
+  const [result, setResult] = useState<AzureResult | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
 
   const recorderRef = useRef<MediaRecorder | null>(null)
@@ -126,7 +108,6 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
       setState('unsupported')
       return
     }
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { channelCount: 1, sampleRate: 16000 },
@@ -142,35 +123,31 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
       }
 
       recorder.onstop = async () => {
-        // Release mic
         for (const track of streamRef.current?.getTracks() ?? []) track.stop()
         streamRef.current = null
-
         setState('analyzing')
 
         try {
           const blob = new Blob(chunksRef.current, { type: mimeType })
           const base64 = await blobToBase64(blob)
-          // Map mimeType → simple audioType string for SpeechSuper
-          const audioType = mimeType.includes('webm')
-            ? 'webm'
-            : mimeType.includes('ogg')
-              ? 'ogg'
-              : 'mp4'
 
-          const res = await fetch('/api/speech/speechsuper', {
+          const res = await fetch('/api/speech/evaluate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audio: base64, audioType, word }),
+            body: JSON.stringify({
+              audio: base64,
+              referenceText: word,
+              language: 'zh-CN',
+            }),
           })
 
-          const json = (await res.json()) as { data: SpeechResult | null; error: string | null }
+          const json = (await res.json()) as AzureResult & { error?: string }
 
-          if (json.error || !json.data) {
-            setErrorMsg(json.error ?? 'เกิดข้อผิดพลาด')
+          if (json.error) {
+            setErrorMsg(json.error)
             setState('error')
           } else {
-            setResult(json.data)
+            setResult(json)
             setState('done')
           }
         } catch {
@@ -179,7 +156,7 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
         }
       }
 
-      recorder.start(100) // chunk every 100 ms
+      recorder.start(100)
       setState('recording')
     } catch {
       setErrorMsg('ไม่สามารถเข้าถึงไมโครโฟนได้ — กรุณาอนุญาตการเข้าถึง')
@@ -242,7 +219,6 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
       {/* ── RECORDING ── */}
       {state === 'recording' && (
         <div className="flex flex-col items-center gap-2.5 py-0.5">
-          {/* Waveform animation */}
           <div className="flex items-end gap-1 h-6">
             {WAVE_BARS.map((bar, i) => (
               <div
@@ -280,56 +256,51 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
       {/* ── DONE ── */}
       {state === 'done' && result && (
         <div className="space-y-2.5">
-          {/* Per-syllable breakdown */}
-          {result.syllables.map((syl, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: syllables are positional
-            <div key={i} className="space-y-1.5">
-              {/* Header row: tone marker */}
-              <p className="text-[10px] text-[#9A9179] font-medium">
-                พยางค์ {i + 1} —{' '}
-                <span className="font-mono text-[#3D3630]">
-                  {syl.initial}
-                  {syl.final}
-                </span>{' '}
-                <span className="text-[#C4704B]">{toneSymbol(syl.tone)}</span>
-              </p>
+          {/* What Azure heard */}
+          <div className="flex items-center gap-2 px-2.5 py-1.5 bg-[#FFFEFB] border border-[#E8E0D5] rounded-lg">
+            <span className="text-[10px] text-[#9A9179] shrink-0">Azure ได้ยิน</span>
+            <span className="font-medium text-[#2C2824] text-sm flex-1">
+              {result.recognized || '(ไม่ได้ยิน)'}
+            </span>
+            {result.recognized === word ? (
+              <span className="text-[#6B7F5E] text-xs font-semibold shrink-0">✓ ถูก</span>
+            ) : (
+              <span className="text-[#B56B6B] text-xs font-semibold shrink-0">✗ ผิด</span>
+            )}
+          </div>
 
-              <div className="grid grid-cols-[5.5rem_1fr] gap-y-1.5 gap-x-2 text-xs items-center">
-                {/* Initial */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[#9A9179]">เสียงต้น</span>
-                  <span className="font-mono font-semibold text-[#2C2824] bg-[#F0EBE3] px-1.5 rounded text-[11px]">
-                    {syl.initial || '∅'}
-                  </span>
-                </div>
-                <ScoreBar score={syl.initialScore} />
+          {/* Score bars */}
+          <div className="space-y-1.5">
+            <ScoreBar score={result.accuracyScore} label="ความถูกต้อง" />
+            <ScoreBar score={result.fluencyScore} label="ความลื่นไหล" />
+            <ScoreBar score={result.completenessScore} label="ครบถ้วน" />
+          </div>
 
-                {/* Final */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[#9A9179]">เสียงสระ</span>
-                  <span className="font-mono font-semibold text-[#2C2824] bg-[#F0EBE3] px-1.5 rounded text-[11px]">
-                    {syl.final || '∅'}
-                  </span>
-                </div>
-                <ScoreBar score={syl.finalScore} />
-
-                {/* Tone */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[#9A9179]">วรรณยุกต์</span>
-                  <span className="font-mono font-semibold text-[#C4704B] bg-[#FFF3ED] px-1.5 rounded text-[11px]">
-                    {toneSymbol(syl.tone)}
-                  </span>
-                </div>
-                <ScoreBar score={syl.toneScore} />
-              </div>
-            </div>
-          ))}
-
-          {/* Overall score row */}
+          {/* Overall + retry */}
           <div className="flex items-center gap-3 pt-1.5 border-t border-[#E8E0D5]">
             <span className="text-xs font-semibold text-[#3D3630] shrink-0">คะแนนรวม</span>
             <div className="flex-1 min-w-0">
-              <ScoreBar score={result.overall} />
+              <div className="grid grid-cols-[1fr_2rem] items-center gap-x-2">
+                <div className="h-1.5 bg-[#E8E0D5] rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700 ease-out"
+                    style={{
+                      width: `${result.score}%`,
+                      backgroundColor:
+                        result.score >= 80 ? '#6B7F5E' : result.score >= 60 ? '#C4704B' : '#B56B6B',
+                    }}
+                  />
+                </div>
+                <span
+                  className="text-right font-bold text-[12px]"
+                  style={{
+                    color:
+                      result.score >= 80 ? '#6B7F5E' : result.score >= 60 ? '#C4704B' : '#B56B6B',
+                  }}
+                >
+                  {result.score}
+                </span>
+              </div>
             </div>
             <button
               type="button"
