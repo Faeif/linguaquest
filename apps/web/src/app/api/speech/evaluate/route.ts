@@ -170,10 +170,10 @@ export async function POST(req: NextRequest) {
     )
 
     // ── Audio input: tell Azure the stream is WebM/Opus ────────────────────
+    // AudioStreamContainerFormat is not exported in SDK 1.x — use getWaveFormat
+    // with AudioFormatTag.WEBM_OPUS (tag value 7) instead.
     const audioBuffer = Buffer.from(audio, 'base64')
-    const format = sdk.AudioStreamFormat.getCompressedFormat(
-      sdk.AudioStreamContainerFormat.WEBM_OPUS
-    )
+    const format = sdk.AudioStreamFormat.getWaveFormat(16000, 16, 1, sdk.AudioFormatTag.WEBM_OPUS)
     const pushStream = sdk.AudioInputStream.createPushStream(format)
     pushStream.write(
       audioBuffer.buffer.slice(
