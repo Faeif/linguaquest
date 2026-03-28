@@ -4,7 +4,7 @@
  * Returns: { overall, toneScore, initialScore, finalScore, syllables[] }
  */
 import { createHash } from 'node:crypto'
-import { createServerClient } from '@linguaquest/db/supabase/server'
+import { createServerSupabase } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -54,7 +54,7 @@ function buildAuth(appKey: string, secretKey: string) {
 export async function POST(req: Request) {
   try {
     // 1. Auth
-    const supabase = createServerClient()
+    const supabase = createServerSupabase()
     const {
       data: { user },
     } = await supabase.auth.getUser()
