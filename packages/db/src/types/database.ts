@@ -28,6 +28,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_user_profile: {
+        Row: {
+          active_vocab: Json | null
+          created_at: string | null
+          grammar_weak_points: string[] | null
+          hsk_estimate: string | null
+          last_computed_at: string | null
+          phoneme_errors: Json | null
+          updated_at: string | null
+          user_id: string
+          weak_vocab_tags: string[] | null
+        }
+        Insert: {
+          active_vocab?: Json | null
+          created_at?: string | null
+          grammar_weak_points?: string[] | null
+          hsk_estimate?: string | null
+          last_computed_at?: string | null
+          phoneme_errors?: Json | null
+          updated_at?: string | null
+          user_id: string
+          weak_vocab_tags?: string[] | null
+        }
+        Update: {
+          active_vocab?: Json | null
+          created_at?: string | null
+          grammar_weak_points?: string[] | null
+          hsk_estimate?: string | null
+          last_computed_at?: string | null
+          phoneme_errors?: Json | null
+          updated_at?: string | null
+          user_id?: string
+          weak_vocab_tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'ai_user_profile_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: true
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       cards: {
         Row: {
           audio_url_uk: string | null
@@ -182,6 +226,157 @@ export type Database = {
           },
         ]
       }
+      essay_submissions: {
+        Row: {
+          ai_feedback: Json | null
+          cefr_score: string | null
+          created_at: string | null
+          id: string
+          prompt_text: string | null
+          tokens_used: number | null
+          user_essay: string
+          user_id: string | null
+        }
+        Insert: {
+          ai_feedback?: Json | null
+          cefr_score?: string | null
+          created_at?: string | null
+          id?: string
+          prompt_text?: string | null
+          tokens_used?: number | null
+          user_essay: string
+          user_id?: string | null
+        }
+        Update: {
+          ai_feedback?: Json | null
+          cefr_score?: string | null
+          created_at?: string | null
+          id?: string
+          prompt_text?: string | null
+          tokens_used?: number | null
+          user_essay?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'essay_submissions_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      global_cards: {
+        Row: {
+          audio_url: string | null
+          components: string[] | null
+          content: Json
+          created_at: string | null
+          definition_en: string | null
+          definition_th: string
+          examples: Json | null
+          hsk_level: string | null
+          id: string
+          pinyin: string | null
+          pinyin_numbered: string | null
+          search_count: number | null
+          stroke_count: number | null
+          tones: number[] | null
+          updated_at: string | null
+          usage_count: number | null
+          word: string
+        }
+        Insert: {
+          audio_url?: string | null
+          components?: string[] | null
+          content: Json
+          created_at?: string | null
+          definition_en?: string | null
+          definition_th: string
+          examples?: Json | null
+          hsk_level?: string | null
+          id?: string
+          pinyin?: string | null
+          pinyin_numbered?: string | null
+          search_count?: number | null
+          stroke_count?: number | null
+          tones?: number[] | null
+          updated_at?: string | null
+          usage_count?: number | null
+          word: string
+        }
+        Update: {
+          audio_url?: string | null
+          components?: string[] | null
+          content?: Json
+          created_at?: string | null
+          definition_en?: string | null
+          definition_th?: string
+          examples?: Json | null
+          hsk_level?: string | null
+          id?: string
+          pinyin?: string | null
+          pinyin_numbered?: string | null
+          search_count?: number | null
+          stroke_count?: number | null
+          tones?: number[] | null
+          updated_at?: string | null
+          usage_count?: number | null
+          word?: string
+        }
+        Relationships: []
+      }
+      hsk_reviews: {
+        Row: {
+          assessed_at: string | null
+          created_at: string
+          difficulty: number
+          hsk_level: number
+          id: string
+          next_review_at: string
+          review_count: number
+          stability: number
+          state: string
+          user_id: string
+          word_simplified: string
+        }
+        Insert: {
+          assessed_at?: string | null
+          created_at?: string
+          difficulty?: number
+          hsk_level: number
+          id?: string
+          next_review_at?: string
+          review_count?: number
+          stability?: number
+          state?: string
+          user_id: string
+          word_simplified: string
+        }
+        Update: {
+          assessed_at?: string | null
+          created_at?: string
+          difficulty?: number
+          hsk_level?: number
+          id?: string
+          next_review_at?: string
+          review_count?: number
+          stability?: number
+          state?: string
+          user_id?: string
+          word_simplified?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'hsk_reviews_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -190,17 +385,17 @@ export type Database = {
           daily_goal_minutes: number | null
           display_name: string | null
           email: string | null
-          goal: string | null
+          hsk_self_assessed: string | null
           id: string
           is_banned: boolean | null
-          level: string | null
+          learning_goal: string | null
           onboarding_completed: boolean | null
           role: string | null
           subscription: string | null
           subscription_expires_at: string | null
           trust_score: number | null
           updated_at: string | null
-          username: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -209,17 +404,17 @@ export type Database = {
           daily_goal_minutes?: number | null
           display_name?: string | null
           email?: string | null
-          goal?: string | null
+          hsk_self_assessed?: string | null
           id: string
           is_banned?: boolean | null
-          level?: string | null
+          learning_goal?: string | null
           onboarding_completed?: boolean | null
           role?: string | null
           subscription?: string | null
           subscription_expires_at?: string | null
           trust_score?: number | null
           updated_at?: string | null
-          username: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -228,19 +423,82 @@ export type Database = {
           daily_goal_minutes?: number | null
           display_name?: string | null
           email?: string | null
-          goal?: string | null
+          hsk_self_assessed?: string | null
           id?: string
           is_banned?: boolean | null
-          level?: string | null
+          learning_goal?: string | null
           onboarding_completed?: boolean | null
           role?: string | null
           subscription?: string | null
           subscription_expires_at?: string | null
           trust_score?: number | null
           updated_at?: string | null
-          username?: string
+          username?: string | null
         }
         Relationships: []
+      }
+      review_logs: {
+        Row: {
+          card_id: string
+          difficulty: number | null
+          due: string
+          elapsed_days: number | null
+          id: string
+          last_elapsed_days: number | null
+          rating: string
+          review_duration_ms: number | null
+          reviewed_at: string | null
+          scheduled_days: number | null
+          stability: number | null
+          state: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          difficulty?: number | null
+          due: string
+          elapsed_days?: number | null
+          id?: string
+          last_elapsed_days?: number | null
+          rating: string
+          review_duration_ms?: number | null
+          reviewed_at?: string | null
+          scheduled_days?: number | null
+          stability?: number | null
+          state: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          difficulty?: number | null
+          due?: string
+          elapsed_days?: number | null
+          id?: string
+          last_elapsed_days?: number | null
+          rating?: string
+          review_duration_ms?: number | null
+          reviewed_at?: string | null
+          scheduled_days?: number | null
+          stability?: number | null
+          state?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'review_logs_global_card_id_fkey'
+            columns: ['card_id']
+            isOneToOne: false
+            referencedRelation: 'global_cards'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'review_logs_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
       study_sessions: {
         Row: {
@@ -290,58 +548,137 @@ export type Database = {
           },
         ]
       }
+      user_category_progress: {
+        Row: {
+          category_id: string
+          completed_at: string | null
+          is_completed: boolean | null
+          last_studied_at: string | null
+          learned_words: number | null
+          mastered_words: number | null
+          progress_percentage: number | null
+          total_words: number | null
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          completed_at?: string | null
+          is_completed?: boolean | null
+          last_studied_at?: string | null
+          learned_words?: number | null
+          mastered_words?: number | null
+          progress_percentage?: number | null
+          total_words?: number | null
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          completed_at?: string | null
+          is_completed?: boolean | null
+          last_studied_at?: string | null
+          learned_words?: number | null
+          mastered_words?: number | null
+          progress_percentage?: number | null
+          total_words?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_category_progress_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'vocabulary_categories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_category_progress_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       user_progress: {
         Row: {
           card_id: string | null
+          card_type: string | null
           correct_count: number | null
           created_at: string | null
+          difficulty_rating: number | null
           ease_factor: number | null
+          fsrs_data: Json | null
+          fsrs_state: string | null
           id: string
           interval_days: number | null
           is_mastered: boolean | null
+          last_elapsed_days: number | null
           last_reviewed_at: string | null
           next_review_at: string | null
           repetitions: number | null
+          scheduled_days: number | null
+          stability: number | null
           total_reviews: number | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
           card_id?: string | null
+          card_type?: string | null
           correct_count?: number | null
           created_at?: string | null
+          difficulty_rating?: number | null
           ease_factor?: number | null
+          fsrs_data?: Json | null
+          fsrs_state?: string | null
           id?: string
           interval_days?: number | null
           is_mastered?: boolean | null
+          last_elapsed_days?: number | null
           last_reviewed_at?: string | null
           next_review_at?: string | null
           repetitions?: number | null
+          scheduled_days?: number | null
+          stability?: number | null
           total_reviews?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           card_id?: string | null
+          card_type?: string | null
           correct_count?: number | null
           created_at?: string | null
+          difficulty_rating?: number | null
           ease_factor?: number | null
+          fsrs_data?: Json | null
+          fsrs_state?: string | null
           id?: string
           interval_days?: number | null
           is_mastered?: boolean | null
+          last_elapsed_days?: number | null
           last_reviewed_at?: string | null
           next_review_at?: string | null
           repetitions?: number | null
+          scheduled_days?: number | null
+          stability?: number | null
           total_reviews?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'user_progress_card_id_fkey'
+            foreignKeyName: 'user_progress_card_id_global_cards_fkey'
             columns: ['card_id']
             isOneToOne: false
-            referencedRelation: 'cards'
+            referencedRelation: 'global_cards'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_progress_global_card_id_fkey'
+            columns: ['card_id']
+            isOneToOne: false
+            referencedRelation: 'global_cards'
             referencedColumns: ['id']
           },
           {
@@ -417,6 +754,116 @@ export type Database = {
             columns: ['user_id']
             isOneToOne: true
             referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      vocabulary_categories: {
+        Row: {
+          category_type: string
+          color: string | null
+          created_at: string | null
+          description_en: string | null
+          description_th: string | null
+          difficulty: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_official: boolean | null
+          level: number
+          name_en: string
+          name_th: string
+          name_zh: string | null
+          parent_id: string | null
+          priority: number | null
+          slug: string
+          updated_at: string | null
+          word_count: number | null
+        }
+        Insert: {
+          category_type: string
+          color?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_th?: string | null
+          difficulty?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_official?: boolean | null
+          level: number
+          name_en: string
+          name_th: string
+          name_zh?: string | null
+          parent_id?: string | null
+          priority?: number | null
+          slug: string
+          updated_at?: string | null
+          word_count?: number | null
+        }
+        Update: {
+          category_type?: string
+          color?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_th?: string | null
+          difficulty?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_official?: boolean | null
+          level?: number
+          name_en?: string
+          name_th?: string
+          name_zh?: string | null
+          parent_id?: string | null
+          priority?: number | null
+          slug?: string
+          updated_at?: string | null
+          word_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'vocabulary_categories_parent_id_fkey'
+            columns: ['parent_id']
+            isOneToOne: false
+            referencedRelation: 'vocabulary_categories'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      word_category_mapping: {
+        Row: {
+          added_at: string | null
+          category_id: string
+          is_primary: boolean | null
+          word_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          category_id: string
+          is_primary?: boolean | null
+          word_id: string
+        }
+        Update: {
+          added_at?: string | null
+          category_id?: string
+          is_primary?: boolean | null
+          word_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'word_category_mapping_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'vocabulary_categories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'word_category_mapping_word_id_fkey'
+            columns: ['word_id']
+            isOneToOne: false
+            referencedRelation: 'global_cards'
             referencedColumns: ['id']
           },
         ]
