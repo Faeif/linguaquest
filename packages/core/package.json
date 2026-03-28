@@ -17,6 +17,9 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.48",
     "@ai-sdk/provider": "^3.0.8",
-    "ai": "^6.0.140"
+    "ai": "^6.0.140",
+    "simple-ts-fsrs": "npm:@jsr/austinshelby__simple-ts-fsrs",
+    "hanzi": "github:nieldlr/hanzi",
+    "plain-pinyin": "github:digglesby/plain-pinyin"
   }
 }

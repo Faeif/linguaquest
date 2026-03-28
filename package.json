@@ -14,7 +14,13 @@
     "format": "biome format --write .",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "hsk:generate": "python3 scripts/fix-thai-meanings.py && node --experimental-strip-types scripts/generate-hsk-data.mts",
+    "hsk:thai": "node --experimental-strip-types scripts/generate-thai-meanings.mts",
+    "hsk:sentences": "node --experimental-strip-types scripts/generate-sentences.mts",
+    "hsk:pos": "node --experimental-strip-types scripts/generate-pos-tags.mts",
+    "hsk:all": "pnpm hsk:thai && pnpm hsk:sentences && pnpm hsk:pos && pnpm hsk:generate",
+    "audio:upload": "node --experimental-strip-types scripts/upload-audio-r2.mts"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,json}": [
