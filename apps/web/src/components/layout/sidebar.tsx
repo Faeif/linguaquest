@@ -7,6 +7,7 @@ import {
   Mic,
   PanelLeft,
   PanelLeftClose,
+  PenLine,
   ShoppingBag,
   Sparkles,
   User,
@@ -116,6 +117,13 @@ export function Sidebar({
             >
               <Mic size={18} className="shrink-0" />
               <span className="whitespace-nowrap">Speaking Coach</span>
+            </Link>
+            <Link
+              href="/writing"
+              className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#7A7067] rounded-lg hover:bg-[#E8E0D5]/50 transition-colors"
+            >
+              <PenLine size={18} className="shrink-0" />
+              <span className="whitespace-nowrap">Writing Coach</span>
             </Link>
           </nav>
         </div>
