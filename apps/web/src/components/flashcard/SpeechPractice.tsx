@@ -201,7 +201,20 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
 
         try {
           const blob = new Blob(chunksRef.current, { type: mimeType })
+
+          if (blob.size === 0) {
+            setErrorMsg('ไม่ได้รับเสียง — กรุณากดค้างแล้วพูด แล้วกดหยุด')
+            setState('error')
+            return
+          }
+
           const base64 = await blobToBase64(blob)
+
+          if (!base64) {
+            setErrorMsg('แปลงเสียงไม่สำเร็จ — ลองอีกครั้ง')
+            setState('error')
+            return
+          }
 
           const res = await fetch('/api/speech/evaluate', {
             method: 'POST',
@@ -238,7 +251,12 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
   }, [word, pinyin])
 
   const stopRecording = useCallback(() => {
-    if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
+    const rec = recorderRef.current
+    if (rec?.state === 'recording') {
+      // requestData flushes any buffered audio before stop fires onstop
+      rec.requestData()
+      rec.stop()
+    }
   }, [])
 
   const reset = useCallback(() => {
