@@ -10,6 +10,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@linguaquest/core": "workspace:*",
+    "@linguaquest/db": "workspace:*",
+    "simple-ts-fsrs": "npm:@jsr/austinshelby__simple-ts-fsrs",
     "@ai-sdk/openai": "^3.0.48",
     "@hookform/resolvers": "^5.2.2",
     "@sentry/nextjs": "^10.45.0",
