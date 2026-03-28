@@ -8,6 +8,7 @@
  * - Use in API routes and server components only
  */
 
+// @ts-expect-error
 import type { Definition } from 'hanzi'
 import { enrichCardWithThai } from './ai-enrichment'
 import { fsrsScheduler } from './fsrs-scheduler'
@@ -36,7 +37,9 @@ export async function initializeHanziJS() {
     // @ts-expect-error
     const hanziModule = await import('hanzi')
     hanzi = hanziModule.default || hanziModule
-    hanzi.start() // Initialize HanziJS
+    if (hanzi) {
+      hanzi.start() // Initialize HanziJS
+    }
   }
 }
 
@@ -68,6 +71,7 @@ export class CardGenerator {
     const { enrich = false, audioBaseUrl = '/audio/pinyin' } = options
 
     // Get character data from HanziJS
+    if (!hanzi) throw new Error('HanziJS not initialized')
     const definitions = hanzi.definitionLookup(word, 's') || []
 
     // Get pinyin with tones
@@ -238,7 +242,7 @@ export class CardGenerator {
     if (!word || !hanzi) return 'advanced'
     const frequency = hanzi.getCharacterFrequency(word[0])
 
-    if (!frequency || frequency === 'Character not found') return 'advanced'
+    if (!frequency) return 'advanced'
 
     const rank = parseInt(frequency.number, 10)
 

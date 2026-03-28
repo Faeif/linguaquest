@@ -1,19 +1,19 @@
 declare module 'hanzi' {
-  interface Definition {
+  export interface Definition {
     traditional: string
     simplified: string
     pinyin: string
     definition: string
   }
 
-  interface Decomposition {
+  export interface Decomposition {
     character: string
     components1: string[]
     components2?: string[]
     components3?: string[]
   }
 
-  interface FrequencyResult {
+  export interface FrequencyResult {
     number: string
     character: string
     count: string
@@ -22,12 +22,12 @@ declare module 'hanzi' {
     meaning: string
   }
 
-  function start(): void
-  function definitionLookup(character: string, type?: 's' | 't'): Definition[] | null
-  function decompose(character: string, type?: number): Decomposition | null
-  function getExamples(character: string): Definition[]
-  function segment(text: string): string[]
-  function getCharacterFrequency(character: string): FrequencyResult | null
+  export function start(): void
+  export function definitionLookup(character: string, type?: 's' | 't'): Definition[] | null
+  export function decompose(character: string, type?: number): Decomposition | null
+  export function getExamples(character: string): Definition[]
+  export function segment(text: string): string[]
+  export function getCharacterFrequency(character: string): FrequencyResult | null
   function getCharactersWithComponent(component: string): string[]
 
   export default {

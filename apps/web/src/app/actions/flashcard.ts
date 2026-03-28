@@ -136,7 +136,8 @@ export async function getDueCardsAction(categoryId?: string, limit = 20) {
     // Avoid returning 500 by catching and returning empty or error info
     // But since this is a server action, throwing will still cause 500 unless we return a response object
     // We'll throw a clearer message.
-    throw new Error(`Flashcard Service Error: ${err.message}`)
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+    throw new Error(`Flashcard Service Error: ${errorMessage}`)
   }
 }
 
