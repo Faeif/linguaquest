@@ -42,3 +42,6 @@ npm-debug.log*
 # Supabase
 supabase/.branches
 supabase/.temp
+
+# Agent Workspace
+.claude/
