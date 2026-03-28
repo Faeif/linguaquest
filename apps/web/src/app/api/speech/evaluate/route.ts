@@ -1,14 +1,14 @@
 /**
  * POST /api/speech/evaluate
- * Azure Cognitive Services Pronunciation Assessment for Chinese (zh-CN).
+ * Azure Cognitive Services Pronunciation Assessment — REST API (no SDK).
  *
- * Request: { audio: base64, referenceText: string, pinyin?: string, language?: string }
+ * Using the REST API directly avoids the SDK's audio-format issues with WebM/Opus.
+ * Endpoint: https://{region}.stt.speech.microsoft.com/speech/recognition/conversation/…
+ * Pronunciation-Assessment header carries base64-encoded JSON config.
+ *
+ * Request:  { audio: base64, referenceText: string, pinyin?: string, language?: string }
  * Response: { score, accuracyScore, fluencyScore, completenessScore, recognized, syllables[] }
- *
- * syllables[] = per-syllable breakdown: initial, final, detectedTone,
- *               initialScore, finalScore, toneScore
  */
-import * as sdk from 'microsoft-cognitiveservices-speech-sdk'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -46,7 +46,7 @@ const TONE_MARKS: Record<string, number> = {
 const INITIALS = [
   'zh',
   'ch',
-  'sh', // must check 2-char initials first
+  'sh',
   'b',
   'p',
   'm',
@@ -85,14 +85,12 @@ function parsePinyinSyllable(py: string): { initial: string; final: string; tone
       break
     }
   }
-  // Strip diacritics, normalise ü
   const base = py
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/ü/g, 'u')
     .toLowerCase()
     .trim()
-
   let initial = ''
   for (const ini of INITIALS) {
     if (base.startsWith(ini)) {
@@ -100,36 +98,55 @@ function parsePinyinSyllable(py: string): { initial: string; final: string; tone
       break
     }
   }
-  const final = base.slice(initial.length)
-  return { initial, final, tone }
+  return { initial, final: base.slice(initial.length), tone }
 }
 
-// Detected tone from Azure syllable symbol e.g. "huang2" → 2
 function detectedTone(syllableSymbol: string): number {
   const digit = syllableSymbol?.slice(-1)
   const n = Number.parseInt(digit ?? '', 10)
   return Number.isNaN(n) || n < 1 || n > 5 ? 5 : n
 }
 
-// ─── Azure JSON types ─────────────────────────────────────────────────────────
+// ─── Azure REST response types ────────────────────────────────────────────────
+
+interface AzurePAScore {
+  AccuracyScore?: number
+  FluencyScore?: number
+  CompletenessScore?: number
+  PronScore?: number
+  ErrorType?: string
+}
 
 interface AzurePhoneme {
   Phoneme?: string
-  PronunciationAssessment?: { AccuracyScore?: number }
+  PronunciationAssessment?: AzurePAScore
 }
 
 interface AzureSyllable {
   Syllable?: string
-  PronunciationAssessment?: { AccuracyScore?: number }
+  PronunciationAssessment?: AzurePAScore
 }
 
 interface AzureWord {
-  Phonemes?: AzurePhoneme[]
+  Word?: string
+  PronunciationAssessment?: AzurePAScore
   Syllables?: AzureSyllable[]
+  Phonemes?: AzurePhoneme[]
 }
 
-interface AzureJsonResult {
-  NBest?: Array<{ Words?: AzureWord[] }>
+interface AzureNBest {
+  Confidence?: number
+  Lexical?: string
+  ITN?: string
+  Display?: string
+  PronunciationAssessment?: AzurePAScore
+  Words?: AzureWord[]
+}
+
+interface AzureSpeechResult {
+  RecognitionStatus?: string
+  DisplayText?: string
+  NBest?: AzureNBest[]
 }
 
 // ─── Route ────────────────────────────────────────────────────────────────────
@@ -154,87 +171,75 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing audio or referenceText' }, { status: 400 })
     }
 
-    // ── Speech config ──────────────────────────────────────────────────────
-    const speechConfig = sdk.SpeechConfig.fromSubscription(azureKey, azureRegion)
-    speechConfig.speechRecognitionLanguage = language
+    // ── Build Pronunciation-Assessment header (base64 JSON) ────────────────
+    const paConfig = {
+      ReferenceText: referenceText,
+      GradingSystem: 'HundredMark',
+      Granularity: 'Phoneme',
+      EnableMiscue: true,
+    }
+    const paHeader = Buffer.from(JSON.stringify(paConfig)).toString('base64')
 
-    // Enable detailed phoneme + syllable output
-    speechConfig.setProperty(sdk.PropertyId.SpeechServiceConnection_RecoMode, 'INTERACTIVE')
-
-    // Pronunciation Assessment at Phoneme granularity
-    const pronunciationConfig = new sdk.PronunciationAssessmentConfig(
-      referenceText,
-      sdk.PronunciationAssessmentGradingSystem.HundredMark,
-      sdk.PronunciationAssessmentGranularity.Phoneme,
-      true // enableMiscue
-    )
-
-    // ── Audio input: tell Azure the stream is WebM/Opus ────────────────────
-    // AudioStreamContainerFormat is not exported in SDK 1.x — use getWaveFormat
-    // with AudioFormatTag.WEBM_OPUS (tag value 7) instead.
+    // ── Call Azure REST API ────────────────────────────────────────────────
     const audioBuffer = Buffer.from(audio, 'base64')
-    const format = sdk.AudioStreamFormat.getWaveFormat(16000, 16, 1, sdk.AudioFormatTag.WEBM_OPUS)
-    const pushStream = sdk.AudioInputStream.createPushStream(format)
-    pushStream.write(
-      audioBuffer.buffer.slice(
-        audioBuffer.byteOffset,
-        audioBuffer.byteOffset + audioBuffer.byteLength
-      ) as ArrayBuffer
-    )
-    pushStream.close()
+    const url =
+      `https://${azureRegion}.stt.speech.microsoft.com` +
+      `/speech/recognition/conversation/cognitiveservices/v1` +
+      `?language=${language}&format=detailed&profanity=removed`
 
-    const audioConfig = sdk.AudioConfig.fromStreamInput(pushStream)
-    const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig)
-    pronunciationConfig.applyTo(recognizer)
-
-    // ── Recognize ──────────────────────────────────────────────────────────
-    const result = await new Promise<sdk.SpeechRecognitionResult>((resolve, reject) => {
-      recognizer.recognizeOnceAsync(
-        (res) => {
-          recognizer.close()
-          resolve(res)
-        },
-        (err) => {
-          recognizer.close()
-          reject(new Error(err))
-        }
-      )
+    const azureRes = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': azureKey,
+        'Content-Type': 'audio/webm;codecs=opus',
+        'Pronunciation-Assessment': paHeader,
+      },
+      body: audioBuffer,
     })
 
-    if (result.reason === sdk.ResultReason.NoMatch) {
-      return NextResponse.json({
-        score: 0,
-        accuracyScore: 0,
-        fluencyScore: 0,
-        completenessScore: 0,
-        recognized: '',
-        syllables: [],
-      })
+    if (!azureRes.ok) {
+      const errText = await azureRes.text()
+      console.error('[evaluate] Azure REST error:', azureRes.status, errText)
+      return NextResponse.json({ error: `Azure error ${azureRes.status}` }, { status: 502 })
     }
-    if (result.reason !== sdk.ResultReason.RecognizedSpeech) {
+
+    const raw = (await azureRes.json()) as AzureSpeechResult
+
+    if (raw.RecognitionStatus !== 'Success') {
+      // NoMatch — user was silent or audio too short
+      if (
+        raw.RecognitionStatus === 'NoMatch' ||
+        raw.RecognitionStatus === 'InitialSilenceTimeout'
+      ) {
+        return NextResponse.json({
+          score: 0,
+          accuracyScore: 0,
+          fluencyScore: 0,
+          completenessScore: 0,
+          recognized: '',
+          syllables: [],
+        })
+      }
       return NextResponse.json(
-        { error: 'Recognition failed', reason: result.reason },
+        { error: `Recognition status: ${raw.RecognitionStatus}` },
         { status: 422 }
       )
     }
 
-    const assessment = sdk.PronunciationAssessmentResult.fromResult(result)
+    // ── Parse overall scores ───────────────────────────────────────────────
+    const nBest = raw.NBest?.[0]
+    const pa = nBest?.PronunciationAssessment
+    const recognized = nBest?.ITN ?? nBest?.Lexical ?? raw.DisplayText ?? ''
+    const words = nBest?.Words ?? []
 
-    // ── Parse JSON result for syllable/phoneme detail ──────────────────────
-    const jsonResult = JSON.parse(
-      result.properties.getProperty(sdk.PropertyId.SpeechServiceResponse_JsonResult) ?? '{}'
-    ) as AzureJsonResult
-    const words = jsonResult?.NBest?.[0]?.Words ?? []
-
-    // Parse expected pinyin syllables
+    // ── Parse expected pinyin ──────────────────────────────────────────────
     const pinyinSyllables = pinyin ? pinyin.split(/\s+/).map(parsePinyinSyllable) : []
 
-    // Build per-syllable breakdown
-    const syllables = words.flatMap((word, wi) => {
-      return (word.Syllables ?? []).map((syl, si) => {
+    // ── Build per-syllable breakdown ───────────────────────────────────────
+    let syllableIdx = 0
+    const syllables = words.flatMap((word) =>
+      (word.Syllables ?? []).map((syl) => {
         const phonemes = word.Phonemes ?? []
-
-        // Split phonemes into initial + final group
         const firstPhoneme = phonemes[0]?.Phoneme?.toLowerCase() ?? ''
         const hasInitial = INITIALS.some((ini) => firstPhoneme === ini)
 
@@ -256,13 +261,14 @@ export async function POST(req: NextRequest) {
               )
             : Math.round(syl.PronunciationAssessment?.AccuracyScore ?? 0)
 
-        // Tone score: if detected tone matches expected → syllable accuracy, else penalise
         const detectedToneNum = detectedTone(syl.Syllable ?? '')
-        const expected = pinyinSyllables[wi * (word.Syllables?.length ?? 1) + si]
+        const expected = pinyinSyllables[syllableIdx]
+        syllableIdx++
+
         const expectedToneNum = expected?.tone ?? 5
-        const tonesMatch = detectedToneNum === expectedToneNum
         const rawSylScore = Math.round(syl.PronunciationAssessment?.AccuracyScore ?? 0)
-        const toneScore = tonesMatch ? rawSylScore : Math.round(rawSylScore * 0.5)
+        const toneScore =
+          detectedToneNum === expectedToneNum ? rawSylScore : Math.round(rawSylScore * 0.5)
 
         return {
           syllable: syl.Syllable ?? '',
@@ -277,17 +283,16 @@ export async function POST(req: NextRequest) {
           initialScore,
           finalScore,
           toneScore,
-          syllableScore: rawSylScore,
         }
       })
-    })
+    )
 
     return NextResponse.json({
-      score: Math.round(assessment.pronunciationScore),
-      accuracyScore: Math.round(assessment.accuracyScore),
-      fluencyScore: Math.round(assessment.fluencyScore),
-      completenessScore: Math.round(assessment.completenessScore),
-      recognized: result.text,
+      score: Math.round(pa?.PronScore ?? 0),
+      accuracyScore: Math.round(pa?.AccuracyScore ?? 0),
+      fluencyScore: Math.round(pa?.FluencyScore ?? 0),
+      completenessScore: Math.round(pa?.CompletenessScore ?? 0),
+      recognized: recognized.replace(/[。，！？、]/g, '').trim(),
       syllables,
     })
   } catch (err) {
