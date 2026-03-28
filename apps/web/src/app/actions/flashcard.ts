@@ -124,7 +124,7 @@ export async function getDueCardsAction(categoryId?: string, limit = 20) {
           updated_at: new Date(),
         } as CharacterRecognitionCard
 
-        // @ts-expect-error
+        // @ts-expect-error - predicted_intervals is a dynamic property for UI calculation
         card.predicted_intervals = fsrsScheduler.predictIntervals(card)
         return card
       })
@@ -402,7 +402,7 @@ export async function getNewCardsForCategoryAction(categoryId: string, limit = 1
       updated_at: new Date(),
     } as CharacterRecognitionCard
 
-    // @ts-expect-error
+    // @ts-expect-error - predicted_intervals is a dynamic property for UI calculation
     card.predicted_intervals = fsrsScheduler.predictIntervals(card)
     return card
   })
