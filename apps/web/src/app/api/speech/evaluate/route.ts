@@ -243,6 +243,8 @@ export async function POST(req: NextRequest) {
 
     // ── If Azure heard only noise / punctuation → treat as no-match ───────
     if (!recognized && words.length === 0) {
+      const debugInfo = `Success/empty — ITN:"${nBest?.ITN ?? ''}" Lex:"${nBest?.Lexical ?? ''}" Disp:"${raw.DisplayText ?? ''}"`
+      console.log('[evaluate] no-match after Success:', debugInfo)
       return NextResponse.json({
         score: 0,
         accuracyScore: 0,
@@ -250,6 +252,7 @@ export async function POST(req: NextRequest) {
         completenessScore: 0,
         recognized: '',
         syllables: [],
+        debug: debugInfo,
       })
     }
 
