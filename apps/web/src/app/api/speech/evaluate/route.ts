@@ -188,11 +188,24 @@ export async function POST(req: NextRequest) {
       `/speech/recognition/conversation/cognitiveservices/v1` +
       `?language=${language}&format=detailed&profanity=removed`
 
+    // For WAV, add explicit codec+samplerate so Azure knows exactly what it's getting
+    const contentType =
+      mimeType === 'audio/wav' ? 'audio/wav; codecs=audio/pcm; samplerate=16000' : mimeType
+
+    console.log(
+      '[evaluate] sending',
+      audioBuffer.length,
+      'bytes as',
+      contentType,
+      'ref:',
+      referenceText
+    )
+
     const azureRes = await fetch(url, {
       method: 'POST',
       headers: {
         'Ocp-Apim-Subscription-Key': azureKey,
-        'Content-Type': mimeType,
+        'Content-Type': contentType,
         'Pronunciation-Assessment': paHeader,
       },
       body: audioBuffer,
@@ -205,26 +218,19 @@ export async function POST(req: NextRequest) {
     }
 
     const raw = (await azureRes.json()) as AzureSpeechResult
+    console.log('[evaluate] Azure raw:', JSON.stringify(raw).slice(0, 800))
 
     if (raw.RecognitionStatus !== 'Success') {
       // NoMatch — user was silent or audio too short
-      if (
-        raw.RecognitionStatus === 'NoMatch' ||
-        raw.RecognitionStatus === 'InitialSilenceTimeout'
-      ) {
-        return NextResponse.json({
-          score: 0,
-          accuracyScore: 0,
-          fluencyScore: 0,
-          completenessScore: 0,
-          recognized: '',
-          syllables: [],
-        })
-      }
-      return NextResponse.json(
-        { error: `Recognition status: ${raw.RecognitionStatus}` },
-        { status: 422 }
-      )
+      return NextResponse.json({
+        score: 0,
+        accuracyScore: 0,
+        fluencyScore: 0,
+        completenessScore: 0,
+        recognized: '',
+        syllables: [],
+        debug: raw.RecognitionStatus ?? 'unknown',
+      })
     }
 
     // ── Parse overall scores ───────────────────────────────────────────────

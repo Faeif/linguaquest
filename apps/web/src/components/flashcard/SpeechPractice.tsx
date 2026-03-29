@@ -35,6 +35,7 @@ interface AzureResult {
   completenessScore: number
   recognized: string
   syllables: SyllableResult[]
+  debug?: string
 }
 
 type PracticeState = 'idle' | 'recording' | 'analyzing' | 'done' | 'error' | 'unsupported'
@@ -419,6 +420,9 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
             <div className="flex flex-col items-center gap-1.5 py-3 bg-[#FFFEFB] border border-[#E8E0D5] rounded-lg">
               <p className="text-xs text-[#B56B6B] font-medium">ไม่ได้ยินเสียงชัดเจน</p>
               <p className="text-[10px] text-[#9A9179]">พูดใกล้ไมค์มากขึ้น แล้วออกเสียงให้ชัด</p>
+              {result.debug && (
+                <p className="text-[9px] text-[#C8C2BB] font-mono mt-0.5">[{result.debug}]</p>
+              )}
             </div>
           )}
 
