@@ -251,6 +251,7 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
 
         try {
           const rawBlob = new Blob(chunksRef.current, { type: mimeType })
+          console.log('[speech] rawBlob size:', rawBlob.size, 'type:', mimeType)
 
           if (rawBlob.size === 0) {
             setErrorMsg('ไม่ได้รับเสียง — กรุณากดค้างแล้วพูด แล้วกดหยุด')
@@ -259,8 +260,11 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
           }
 
           // Convert to WAV PCM 16 kHz — Azure's most reliable input format
+          console.log('[speech] converting to WAV…')
           const wavBlob = await toWav(rawBlob)
+          console.log('[speech] wavBlob size:', wavBlob.size)
           const base64 = await blobToBase64(wavBlob)
+          console.log('[speech] base64 length:', base64.length)
 
           if (!base64) {
             setErrorMsg('แปลงเสียงไม่สำเร็จ — ลองอีกครั้ง')
@@ -268,6 +272,7 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
             return
           }
 
+          console.log('[speech] POSTing to /api/speech/evaluate, ref:', word)
           const res = await fetch('/api/speech/evaluate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -280,7 +285,9 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
             }),
           })
 
+          console.log('[speech] response status:', res.status)
           const json = (await res.json()) as AzureResult & { error?: string }
+          console.log('[speech] response json:', JSON.stringify(json).slice(0, 300))
 
           if (json.error) {
             setErrorMsg(json.error)
@@ -289,7 +296,8 @@ export function SpeechPractice({ word, pinyin }: SpeechPracticeProps) {
             setResult(json)
             setState('done')
           }
-        } catch {
+        } catch (err) {
+          console.error('[speech] error:', err)
           setErrorMsg('ไม่สามารถส่งข้อมูลเสียงได้')
           setState('error')
         }
