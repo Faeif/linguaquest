@@ -312,12 +312,20 @@ export async function POST(req: NextRequest) {
     )
 
     return NextResponse.json({
+      _v: 3,
       score: Math.round(pa?.PronScore ?? 0),
       accuracyScore: Math.round(pa?.AccuracyScore ?? 0),
       fluencyScore: Math.round(pa?.FluencyScore ?? 0),
       completenessScore: Math.round(pa?.CompletenessScore ?? 0),
       recognized,
       syllables,
+      _debug: {
+        status: raw.RecognitionStatus,
+        nBestCount: raw.NBest?.length ?? 0,
+        wordCount: nBest?.Words?.length ?? 0,
+        sylCount: syllables.length,
+        displayText: raw.DisplayText ?? '',
+      },
     })
   } catch (err) {
     console.error('[/api/speech/evaluate] error:', err)
