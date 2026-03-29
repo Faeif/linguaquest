@@ -218,7 +218,11 @@ export async function POST(req: NextRequest) {
     }
 
     const raw = (await azureRes.json()) as AzureSpeechResult
-    console.log('[evaluate] Azure raw:', JSON.stringify(raw).slice(0, 800))
+    // Log full raw response for debugging
+    const nBestRaw = raw.NBest?.[0]
+    console.log('[evaluate] status:', raw.RecognitionStatus, 'display:', raw.DisplayText)
+    console.log('[evaluate] pa:', JSON.stringify(nBestRaw?.PronunciationAssessment))
+    console.log('[evaluate] words[0]:', JSON.stringify(nBestRaw?.Words?.[0]).slice(0, 1200))
 
     if (raw.RecognitionStatus !== 'Success') {
       // NoMatch — user was silent or audio too short
@@ -321,10 +325,16 @@ export async function POST(req: NextRequest) {
       syllables,
       _debug: {
         status: raw.RecognitionStatus,
-        nBestCount: raw.NBest?.length ?? 0,
+        pa: nBest?.PronunciationAssessment,
         wordCount: nBest?.Words?.length ?? 0,
-        sylCount: syllables.length,
-        displayText: raw.DisplayText ?? '',
+        word0: nBest?.Words?.[0]
+          ? {
+              word: nBest.Words[0].Word,
+              pa: nBest.Words[0].PronunciationAssessment,
+              syllables: nBest.Words[0].Syllables,
+              phonemes: nBest.Words[0].Phonemes,
+            }
+          : null,
       },
     })
   } catch (err) {
