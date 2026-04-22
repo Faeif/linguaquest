@@ -10,6 +10,7 @@
  * Response: { score, accuracyScore, fluencyScore, completenessScore, recognized, syllables[] }
  */
 import { type NextRequest, NextResponse } from 'next/server'
+import { createServerSupabase } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
 export const maxDuration = 20
@@ -153,6 +154,14 @@ interface AzureSpeechResult {
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createServerSupabase()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = (await req.json()) as {
       audio?: string
       mimeType?: string

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { createServerSupabase } from '@/lib/supabase/server'
 
 // Using Alibaba Cloud's OpenAI-compatible endpoint for SenseVoice (Qwen's ASR)
 const client = new OpenAI({
@@ -9,6 +10,14 @@ const client = new OpenAI({
 
 export async function POST(req: Request) {
   try {
+    const supabase = await createServerSupabase()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const formData = await req.formData()
     const file = formData.get('file') as Blob
 

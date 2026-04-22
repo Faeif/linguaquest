@@ -1,11 +1,20 @@
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk'
 import { type NextRequest, NextResponse } from 'next/server'
+import { createServerSupabase } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
 export const maxDuration = 15
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createServerSupabase()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { text, voice = 'zh-CN-XiaoxiaoNeural' } = await req.json()
 
     const azureKey = process.env.AZURE_SPEECH_KEY
