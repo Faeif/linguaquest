@@ -13,7 +13,7 @@
       "Bash(SUPABASE_DB_URL=\"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" supabase gen types typescript --local)",
       "Bash(grep -n '`' \"/Volumes/Extreme SSD/Ai preneur South!!!/linguaquest/.env.local\")"
     ],
-    "deny": ["Bash(rm -rf:*)", "Bash(git push --force:*)"]
+    "deny": ["Bash(git push --force:*)"]
   },
   "model": "claude-opus-4-5"
 }
