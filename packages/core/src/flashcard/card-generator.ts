@@ -36,7 +36,9 @@ export async function initializeHanziJS() {
   if (!hanzi) {
     const hanziModule = await import('hanzi')
     hanzi = hanziModule.default || hanziModule
-    hanzi!.start() // Initialize HanziJS
+    if (hanzi) {
+      hanzi.start() // Initialize HanziJS
+    }
   }
 }
 
@@ -68,7 +70,8 @@ export class CardGenerator {
     const { enrich = false, audioBaseUrl = '/audio/pinyin' } = options
 
     // Get character data from HanziJS
-    const definitions = hanzi!.definitionLookup(word, 's') || []
+    if (!hanzi) throw new Error('HanziJS not initialized')
+    const definitions = hanzi.definitionLookup(word, 's') || []
 
     // Get pinyin with tones
     const pinyin = definitions[0]?.pinyin || ''
@@ -82,7 +85,7 @@ export class CardGenerator {
     const audioUrl = this.buildAudioUrl(pinyinNumbered, audioBaseUrl)
 
     // Related words from HanziJS examples
-    const examples = hanzi!.getExamples(word) || []
+    const examples = hanzi.getExamples(word) || []
     const relatedWords = examples
       .slice(0, 5)
       .map((ex: Definition) => ex.simplified || ex.traditional)
@@ -236,7 +239,7 @@ export class CardGenerator {
 
   private estimateDifficulty(word: string): 'beginner' | 'intermediate' | 'advanced' {
     if (!word || !hanzi) return 'advanced'
-    const frequency = hanzi!.getCharacterFrequency(word[0] ?? '')
+    const frequency = hanzi.getCharacterFrequency(word[0] ?? '')
     if (!frequency) return 'advanced'
 
     const rank = parseInt(frequency.number, 10)
@@ -272,7 +275,7 @@ export class CardGenerator {
    */
   private resolveHskLevel(word: string): string {
     if (!word || !hanzi) return ''
-    const freq = hanzi!.getCharacterFrequency(word[0] ?? '')
+    const freq = hanzi.getCharacterFrequency(word[0] ?? '')
     if (!freq) return ''
     const rank = parseInt(freq.number, 10)
     if (rank <= 150) return 'hsk1'

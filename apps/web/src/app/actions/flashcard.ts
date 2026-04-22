@@ -133,6 +133,7 @@ export async function getDueCardsAction(categoryId?: string, limit = 20) {
     return cards as FlashCard[]
   } catch (err: unknown) {
     console.error('getDueCardsAction fatal error:', err)
+    // Server actions bubble errors as 500 — throw a clear message with full details
     const errorMessage = err instanceof Error ? err.message : String(err)
     throw new Error(`Flashcard Service Error: ${errorMessage}`)
   }

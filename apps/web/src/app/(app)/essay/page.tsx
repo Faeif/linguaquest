@@ -14,8 +14,8 @@ export default function EssayPage() {
         </div>
         <h2 className="text-lg font-medium text-[#3D3630] mb-2">Coming Soon</h2>
         <p className="text-sm text-[#7A7067] max-w-md mx-auto">
-          ส่งเรียงความหรือข้อเขียนภาษาจีนของคุณ AI จะตรวจไวยากรณ์
-          โครงสร้างประโยค และให้คะแนนพร้อม feedback ที่เข้าใจง่าย
+          ส่งเรียงความหรือข้อเขียนภาษาจีนของคุณ AI จะตรวจไวยากรณ์ โครงสร้างประโยค และให้คะแนนพร้อม feedback
+          ที่เข้าใจง่าย
         </p>
       </div>
     </div>

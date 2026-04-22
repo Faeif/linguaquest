@@ -108,12 +108,19 @@ export async function GET(req: Request) {
       }
 
       const cards: SessionCard[] = []
+      // Cache getWordsByLevel results to avoid repeated calls per level in this loop
+      const levelPoolCache = new Map<HskLevel, ReturnType<typeof getWordsByLevel>>()
+      const getCachedPool = (lvl: HskLevel) => {
+        if (!levelPoolCache.has(lvl)) levelPoolCache.set(lvl, getWordsByLevel(lvl))
+        // biome-ignore lint/style/noNonNullAssertion: guaranteed by has() check above
+        return levelPoolCache.get(lvl)!
+      }
 
       for (const row of dueReviews ?? []) {
         const word = findWord(row.word_simplified)
         if (!word) continue
 
-        const distractorPool = getWordsByLevel(word.level as HskLevel)
+        const distractorPool = getCachedPool(word.level as HskLevel)
         const correctMeaning = word.meaningTh?.split(',')[0]?.trim() ?? word.definitionEn
         const distractors = pickDistractors(correctMeaning, distractorPool)
 

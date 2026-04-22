@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+// Static slot keys — avoids using map index directly as React key
+const OTP_SLOT_KEYS = ['s0', 's1', 's2', 's3', 's4', 's5']
+
 function VerifyEmailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -126,8 +129,10 @@ function VerifyEmailContent() {
       <div className="flex justify-center gap-2">
         {otp.map((digit, index) => (
           <input
-            key={index}
-            ref={(el) => { inputRefs.current[index] = el }}
+            key={OTP_SLOT_KEYS[index]}
+            ref={(el) => {
+              inputRefs.current[index] = el
+            }}
             type="text"
             inputMode="numeric"
             maxLength={1}

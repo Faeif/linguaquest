@@ -36,7 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const userData = {
     display_name: profile?.display_name,
     avatar_url: profile?.avatar_url,
-    email: user.email
+    email: user.email,
   }
 
   return <AppShell user={userData}>{children}</AppShell>

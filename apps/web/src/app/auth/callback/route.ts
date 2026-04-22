@@ -7,10 +7,6 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/home'
 
-  // Debug: log incoming params
-  console.log('[auth/callback] code:', code ? 'present' : 'missing')
-  console.log('[auth/callback] searchParams:', Object.fromEntries(searchParams))
-
   if (code) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -49,8 +45,6 @@ export async function GET(request: Request) {
         .eq('id', user.id)
         .single()
 
-      console.log('[auth/callback] user:', user.email, 'onboarding:', profile?.onboarding_completed)
-
       if (!profile?.onboarding_completed) {
         return NextResponse.redirect(`${origin}/onboarding`)
       }
@@ -64,7 +58,9 @@ export async function GET(request: Request) {
   const errorDesc = searchParams.get('error_description')
   if (errorParam) {
     console.error('[auth/callback] OAuth error:', errorParam, errorDesc)
-    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(errorDesc || errorParam)}`)
+    return NextResponse.redirect(
+      `${origin}/login?error=${encodeURIComponent(errorDesc || errorParam)}`
+    )
   }
 
   console.error('[auth/callback] No code provided')

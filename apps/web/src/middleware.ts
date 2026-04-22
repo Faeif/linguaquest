@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/verify-email')
 
   const isProtectedPage =
+    pathname.startsWith('/onboarding') ||
     pathname.startsWith('/home') ||
     pathname.startsWith('/companion') ||
     pathname.startsWith('/essay') ||
@@ -48,7 +49,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/exam') ||
     pathname.startsWith('/community') ||
     pathname.startsWith('/profile') ||
-    pathname.startsWith('/onboarding')
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/dashboard')
 
   // Redirect unauthenticated users away from protected pages
   if (!user && isProtectedPage) {

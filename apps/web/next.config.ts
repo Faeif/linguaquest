@@ -68,6 +68,7 @@ loadWorkspaceEnv()
 const withSerwist = withSerwistInit({
   swSrc: 'src/app/sw.ts',
   swDest: 'public/sw.js',
+  disable: process.env.NODE_ENV !== 'production',
 })
 
 const nextConfig: NextConfig = {
@@ -77,6 +78,7 @@ const nextConfig: NextConfig = {
     '@linguaquest/utils',
     'simple-ts-fsrs',
   ],
+  serverExternalPackages: ['require-in-the-middle'],
   images: {
     remotePatterns: [
       {

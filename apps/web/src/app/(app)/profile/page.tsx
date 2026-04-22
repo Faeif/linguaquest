@@ -1,10 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
-import { BarChart2, Brain, Flame, Timer, LogOut, Bell, Shield, Sparkles, AlertCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  BarChart2,
+  Bell,
+  Brain,
+  Flame,
+  LogOut,
+  Shield,
+  Sparkles,
+  Timer,
+} from 'lucide-react'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { EditProfileModal } from '@/components/profile/EditProfileModal'
 import { signOutAction } from '@/app/actions/auth'
+import { EditProfileModal } from '@/components/profile/EditProfileModal'
 
 export default async function ProfilePage() {
   const cookieStore = await cookies()
@@ -40,11 +50,13 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 pb-20 lg:pb-0">
       {/* User Header & Edit Modal Component */}
-      <EditProfileModal user={{
-        display_name: profile?.display_name,
-        avatar_url: profile?.avatar_url,
-        email: profile?.email || user.email
-      }} />
+      <EditProfileModal
+        user={{
+          display_name: profile?.display_name,
+          avatar_url: profile?.avatar_url,
+          email: profile?.email || user.email,
+        }}
+      />
 
       {/* Main Stats (Top Row) */}
       <div className="grid grid-cols-3 gap-3">
@@ -73,8 +85,8 @@ export default async function ProfilePage() {
         </div>
         <div className="h-32 flex items-end gap-2 justify-between mt-6">
           {/* Mock Bar Chart */}
-          {[20, 35, 45, 40, 60, 85, 110].map((height, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-2">
+          {[20, 35, 45, 40, 60, 85, 110].map((height) => (
+            <div key={height} className="flex-1 flex flex-col items-center gap-2">
               <div
                 className="w-full bg-[#C4704B]/20 rounded-t-sm relative group"
                 style={{ height: `${(height / 150) * 100}%` }}
@@ -106,7 +118,10 @@ export default async function ProfilePage() {
 
       {/* Settings List */}
       <div className="bg-white border border-[#E8E0D5] rounded-xl overflow-hidden mt-8">
-        <button className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]">
+        <button
+          type="button"
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]"
+        >
           <div className="w-8 h-8 rounded-lg bg-[#DA885B]/10 flex items-center justify-center">
             <Sparkles size={18} className="text-[#DA885B]" />
           </div>
@@ -115,26 +130,40 @@ export default async function ProfilePage() {
             <p className="text-xs text-[#9A9179]">ปลดล็อก 4-D Essay Grader & Advanced AI</p>
           </div>
         </button>
-        <button className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]">
+        <button
+          type="button"
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]"
+        >
           <div className="w-8 h-8 rounded-lg bg-[#9A9179]/10 flex items-center justify-center">
             <Bell size={18} className="text-[#9A9179]" />
           </div>
           <span className="text-sm font-medium text-[#3D3630] flex-1">Preferences & WebPush</span>
         </button>
-        <button className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]">
+        <button
+          type="button"
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]"
+        >
           <div className="w-8 h-8 rounded-lg bg-[#9A9179]/10 flex items-center justify-center">
             <Shield size={18} className="text-[#9A9179]" />
           </div>
-          <span className="text-sm font-medium text-[#3D3630] flex-1">Policies (Privacy & ToS)</span>
+          <span className="text-sm font-medium text-[#3D3630] flex-1">
+            Policies (Privacy & ToS)
+          </span>
         </button>
-        <button className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]">
+        <button
+          type="button"
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors border-b border-[#E8E0D5]"
+        >
           <div className="w-8 h-8 rounded-lg bg-[#9A9179]/10 flex items-center justify-center">
             <AlertCircle size={18} className="text-[#9A9179]" />
           </div>
           <span className="text-sm font-medium text-[#3D3630] flex-1">Contact Support</span>
         </button>
         <form action={signOutAction} className="w-full">
-          <button type="submit" className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors">
+          <button
+            type="submit"
+            className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#FAF7F2] transition-colors"
+          >
             <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
               <LogOut size={18} className="text-red-500" />
             </div>

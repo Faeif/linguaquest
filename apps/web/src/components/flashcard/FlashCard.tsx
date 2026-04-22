@@ -3,6 +3,7 @@
 import { ArrowRight, CheckCircle2, Volume1, Volume2, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SessionCard } from '@/app/api/flashcard/session/route'
+import { SpeechPractice } from './SpeechPractice'
 
 // ─── Audio ────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ function HighlightedText({
   const parts = text.split(/(\[\[.*?\]\])/)
   return (
     <span className={className}>
-      {parts.map((part, i) => {
+      {parts.map((part, _i) => {
         const isHighlight = part.startsWith('[[') && part.endsWith(']]')
         const content = isHighlight ? part.slice(2, -2) : part
         if (!isHighlight) return <span key={`text::${part}`}>{content}</span>
@@ -155,16 +156,10 @@ function OptionButton({
 
 // ─── Main FlashCard ───────────────────────────────────────────────────────────
 
-const AUTO_ADVANCE_CORRECT_MS = 2200
-const AUTO_ADVANCE_WRONG_MS = 4000
-
 export function FlashCard({ card, onAnswer, onNext, isLoading }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
-  const [autoProgress, setAutoProgress] = useState(0)
-  const autoTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const autoStartRef = useRef<number>(0)
   const startTimeRef = useRef<number>(Date.now())
 
   const [options] = useState<string[]>(() => {
@@ -190,34 +185,14 @@ export function FlashCard({ card, onAnswer, onNext, isLoading }: FlashCardProps)
       const elapsedMs = Date.now() - startTimeRef.current
       const isCorrect = index === correctIndex
       setSelectedIndex(index)
-      setTimeout(() => {
-        setIsFlipped(true)
-        const advanceMs = isCorrect ? AUTO_ADVANCE_CORRECT_MS : AUTO_ADVANCE_WRONG_MS
-        autoStartRef.current = Date.now()
-        const TICK = 30
-        autoTimerRef.current = setInterval(() => {
-          const elapsed = Date.now() - autoStartRef.current
-          const progress = Math.min(elapsed / advanceMs, 1)
-          setAutoProgress(progress)
-          if (progress >= 1) {
-            if (autoTimerRef.current) clearInterval(autoTimerRef.current)
-            onNext()
-          }
-        }, TICK)
-      }, 180)
+      // Short delay for option animation, then flip to back face
+      setTimeout(() => setIsFlipped(true), 180)
       onAnswer({ isCorrect, elapsedMs, isNew: card.isNew })
     },
-    [selectedIndex, isLoading, correctIndex, card.isNew, onAnswer, onNext]
+    [selectedIndex, isLoading, correctIndex, card.isNew, onAnswer]
   )
 
-  useEffect(() => {
-    return () => {
-      if (autoTimerRef.current) clearInterval(autoTimerRef.current)
-    }
-  }, [])
-
   const handleNext = useCallback(() => {
-    if (autoTimerRef.current) clearInterval(autoTimerRef.current)
     onNext()
   }, [onNext])
 
@@ -289,6 +264,10 @@ export function FlashCard({ card, onAnswer, onNext, isLoading }: FlashCardProps)
           to   { opacity: 1; transform: translateY(0); }
         }
         .fade-slide-up { animation: fadeSlideUp 0.3s ease-out both; }
+        @keyframes speechWave {
+          0%   { height: 4px; }
+          100% { height: 20px; }
+        }
       `}</style>
 
       <div
@@ -297,7 +276,7 @@ export function FlashCard({ card, onAnswer, onNext, isLoading }: FlashCardProps)
           transformStyle: 'preserve-3d',
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.5s ease-in-out',
-          height: '420px',
+          height: '560px',
         }}
       >
         {/* ══════════════════════ FRONT ══════════════════════════════════════ */}
@@ -483,10 +462,10 @@ export function FlashCard({ card, onAnswer, onNext, isLoading }: FlashCardProps)
             </button>
           </div>
 
-          {/* ── Example sentence ── */}
-          <div className="flex-1 px-5 py-3 min-h-0 overflow-auto">
+          {/* ── Example sentence + Speaking practice (scrollable) ── */}
+          <div className="flex-1 px-5 py-3 min-h-0 overflow-y-auto space-y-2">
             {card.sentence ? (
-              <div className="h-full p-3 bg-[#FAF7F2] border border-[#E8E0D5] rounded-xl space-y-1.5 fade-slide-up">
+              <div className="p-3 bg-[#FAF7F2] border border-[#E8E0D5] rounded-xl space-y-1.5 fade-slide-up">
                 <p className="text-[10px] text-[#9A9179] font-medium uppercase tracking-wide">
                   ตัวอย่างประโยค
                 </p>
@@ -504,23 +483,17 @@ export function FlashCard({ card, onAnswer, onNext, isLoading }: FlashCardProps)
                 />
               </div>
             ) : (
-              <div className="h-full p-3 bg-[#FAF7F2] border border-[#E8E0D5] rounded-xl">
+              <div className="p-3 bg-[#FAF7F2] border border-[#E8E0D5] rounded-xl">
                 <p className="text-xs text-[#9A9179] leading-relaxed">{card.definitionEn}</p>
               </div>
             )}
+
+            {/* ── Speaking practice section ── */}
+            <SpeechPractice word={card.simplified} pinyin={card.pinyin} />
           </div>
 
-          {/* ── Countdown + Next button ── */}
-          <div className="px-5 pb-4 pt-2 space-y-2 shrink-0">
-            <div className="h-0.5 bg-[#E8E0D5] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#C4704B]/50 rounded-full"
-                style={{
-                  width: `${autoProgress * 100}%`,
-                  transition: autoProgress === 0 ? 'none' : 'width 0.03s linear',
-                }}
-              />
-            </div>
+          {/* ── Next button ── */}
+          <div className="px-5 pb-4 pt-2 shrink-0">
             <button
               type="button"
               onClick={handleNext}
