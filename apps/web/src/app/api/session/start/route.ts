@@ -7,11 +7,43 @@ import { createServerSupabase } from '@/lib/supabase/server'
 
 export const maxDuration = 60
 
-// Robust JSON extraction helper
-function extractJSON(text: string) {
-  const match = text.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error(`No JSON object found in response: ${text}`)
-  return match[0]
+// Robust JSON extraction — strips markdown fences then finds outermost JSON object
+function extractJSON(text: string): string {
+  // Strip ```json ... ``` code fences if present
+  const stripped = text
+    .replace(/^```(?:json)?\s*/m, '')
+    .replace(/```\s*$/m, '')
+    .trim()
+
+  // Find the first `{` and scan forward counting braces to find the balanced close
+  const start = stripped.indexOf('{')
+  if (start === -1) throw new Error(`No JSON object found in response: ${text.slice(0, 200)}`)
+
+  let depth = 0
+  let inString = false
+  let escaped = false
+  for (let i = start; i < stripped.length; i++) {
+    const ch = stripped[i]
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (ch === '\\' && inString) {
+      escaped = true
+      continue
+    }
+    if (ch === '"') {
+      inString = !inString
+      continue
+    }
+    if (inString) continue
+    if (ch === '{') depth++
+    else if (ch === '}') {
+      depth--
+      if (depth === 0) return stripped.slice(start, i + 1)
+    }
+  }
+  throw new Error(`Unbalanced JSON braces in response: ${text.slice(0, 200)}`)
 }
 
 // The schemas expected by the orchestrator prompts
@@ -94,7 +126,12 @@ export async function POST(req: Request) {
 
     // Fallback parsing: Extract strictly everything between { and }
     const jsonStr = extractJSON(profileRaw)
-    const learningDNA = learningDNASchema.parse(JSON.parse(jsonStr))
+    let learningDNA: z.infer<typeof learningDNASchema>
+    try {
+      learningDNA = learningDNASchema.parse(JSON.parse(jsonStr))
+    } catch {
+      throw new Error(`Profile builder returned invalid JSON: ${jsonStr.slice(0, 200)}`)
+    }
 
     // 3. LAYER 2: Configuration Orchestrator (Qwen3) -> SessionConfig
     const orchestratorPrompt = ORCHESTRATOR_PROMPT.replace(
@@ -109,7 +146,12 @@ export async function POST(req: Request) {
     })
 
     const configStr = extractJSON(sessionRaw)
-    const sessionConfig = sessionConfigSchema.parse(JSON.parse(configStr))
+    let sessionConfig: z.infer<typeof sessionConfigSchema>
+    try {
+      sessionConfig = sessionConfigSchema.parse(JSON.parse(configStr))
+    } catch {
+      throw new Error(`Orchestrator returned invalid JSON: ${configStr.slice(0, 200)}`)
+    }
 
     // 4. Return the configured session to the client
     // Expected next step: The client saves this configuration and starts calling /api/session/turn
