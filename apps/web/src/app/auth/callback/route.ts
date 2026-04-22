@@ -7,10 +7,6 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/home'
 
-  // Debug: log incoming params
-  console.log('[auth/callback] code:', code ? 'present' : 'missing')
-  console.log('[auth/callback] searchParams:', Object.fromEntries(searchParams))
-
   if (code) {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -48,8 +44,6 @@ export async function GET(request: Request) {
         .select('onboarding_completed')
         .eq('id', user.id)
         .single()
-
-      console.log('[auth/callback] user:', user.email, 'onboarding:', profile?.onboarding_completed)
 
       if (!profile?.onboarding_completed) {
         return NextResponse.redirect(`${origin}/onboarding`)
