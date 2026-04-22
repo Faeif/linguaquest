@@ -39,7 +39,9 @@
       "!**/.next",
       "!**/dist",
       "!**/build",
-      "!**/.turbo"
+      "!**/.turbo",
+      "!**/.claude/skills",
+      "!**/.agents/skills"
     ]
   },
   "overrides": [
