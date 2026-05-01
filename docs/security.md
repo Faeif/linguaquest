@@ -42,6 +42,25 @@ export function verifyTOTP(secret: string, token: string): boolean {
 
 ## 🛡️ API Security
 
+### Standardized Response Format
+
+All API routes must use the standardized response helpers from `@linguaquest/core/api` to ensure consistent error handling and client expectations:
+
+```typescript
+import { successResponse, errorResponse, commonErrors } from '@linguaquest/core/api'
+
+// ✅ Standardized success
+return successResponse({ cards: [] }, { status: 200 })
+
+// ✅ Standardized error
+return commonErrors.unauthorized()
+return commonErrors.rateLimited()
+return commonErrors.validationError(zodError.issues)
+return errorResponse('Something went wrong', { status: 500, code: 'INTERNAL_ERROR' })
+```
+
+Response shape is always `{ data: T | null, error: string | null, code?: string, details?: unknown }`.
+
 ### Rate Limiting — All Endpoints
 ```typescript
 import { Ratelimit } from '@upstash/ratelimit'
@@ -81,18 +100,7 @@ const identifier = `${endpoint}:${userId ?? ip}`
 const { success, limit, remaining, reset } = await ratelimit.limit(identifier)
 
 if (!success) {
-  return Response.json(
-    { data: null, error: 'Too many requests' },
-    {
-      status: 429,
-      headers: {
-        'X-RateLimit-Limit': limit.toString(),
-        'X-RateLimit-Remaining': remaining.toString(),
-        'X-RateLimit-Reset': new Date(reset).toISOString(),
-        'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
-      },
-    }
-  )
+  return commonErrors.rateLimited('Too many requests')
 }
 ```
 
@@ -324,11 +332,21 @@ API:
 □ Zod validation on ALL inputs
 □ Auth check on ALL protected routes
 □ CORS configured (Vercel handles)
+□ Standardized response format used (@linguaquest/core/api)
+□ Business logic NOT in route files (delegate to packages/core)
 
 Database:
 □ RLS enabled on ALL tables
 □ service_role key never in client code
 □ No sensitive data in public schema
+□ Migrations reviewed for least-privilege policies
+
+Code Architecture:
+□ No hardcoded hex colors (use theme tokens only)
+□ No inline business logic in React components
+□ No direct DB queries in UI components (use TanStack Query)
+□ i18n strings centralized in @linguaquest/core/i18n/
+□ Shared UI primitives from @linguaquest/ui used
 
 Headers:
 □ Security headers in next.config.ts
@@ -339,9 +357,11 @@ AI:
 □ Input sanitization before AI prompts
 □ Rate limiting on AI endpoints
 □ Cost monitoring alerts set
+□ Prompt injection filters active
 
 Monitoring:
 □ Sentry configured and tested
 □ PostHog security events tracked
 □ Azure budget alerts set
+□ Suspicious activity detection enabled
 ```
