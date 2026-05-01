@@ -51,7 +51,7 @@ export default function SessionCompleteCard({
             </span>
           </div>
           <div className="space-y-3">
-            {sentenceSummary.map((item) => (
+            {sentenceSummary.map((item, i) => (
               <div key={item.chinese} className="bg-surface rounded-2xl p-3 border border-border">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">

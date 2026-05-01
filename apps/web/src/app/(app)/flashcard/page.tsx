@@ -1,7 +1,7 @@
 import type { HskLevel } from '@linguaquest/db'
 import { getWordCount, getWordsByLevel } from '@linguaquest/db'
 import { redirect } from 'next/navigation'
-import type { LevelStat } from '@/components/flashcard/LevelSelector'
+import type { LevelStat } from '@/features/flashcard/types'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { FlashcardClient } from './FlashcardClient'
 

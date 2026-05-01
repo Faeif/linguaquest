@@ -47,7 +47,7 @@ export function useAudioRecorder() {
 
     try {
       setIsRecording(true)
-      recognitionRef.current.start()
+      recognitionRef.current?.start()
     } catch (err) {
       console.error('Speech recognition start error:', err)
       setIsRecording(false)

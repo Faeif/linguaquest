@@ -4,14 +4,15 @@ import { useState, useRef, useEffect } from 'react'
 import { UserAvatar } from '@/components/profile/UserAvatar'
 import { Sparkles, Bell, Shield, AlertCircle, LogOut } from 'lucide-react'
 import { signOutAction } from '@/app/actions/auth'
+import { useUserProfile } from '@/contexts/UserProfileContext'
 
-export function DesktopUserMenu({ 
-  user,
+export function DesktopUserMenu({
   isSidebarExpanded
-}: { 
-  user?: { display_name?: string | null; avatar_url?: string | null; email?: string },
+}: {
+  user?: { display_name?: string | null; avatar_url?: string | null; email?: string }
   isSidebarExpanded: boolean
 }) {
+  const { profile } = useUserProfile()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -25,8 +26,6 @@ export function DesktopUserMenu({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  if (!user) return null
-
   return (
     <div className="relative mt-auto pt-4 border-t border-[#E8E0D5] w-full" ref={menuRef}>
       <button 
@@ -35,11 +34,11 @@ export function DesktopUserMenu({
           isSidebarExpanded ? 'gap-3 justify-start' : 'justify-center'
         }`}
       >
-        <UserAvatar avatarUrl={user.avatar_url} width={36} height={36} />
+        <UserAvatar avatarUrl={profile.avatar_url} width={36} height={36} />
         {isSidebarExpanded && (
           <div className="flex flex-col items-start overflow-hidden flex-1 text-left">
             <span className="text-sm font-semibold text-[#3D3630] truncate w-full">
-              {user.display_name || 'ผู้ใช้ LinguaQuest'}
+              {profile.display_name || 'ผู้ใช้ LinguaQuest'}
             </span>
             <span className="text-[10px] text-[#9A9179] font-medium">
               Free plan
@@ -52,10 +51,10 @@ export function DesktopUserMenu({
       {isOpen && (
         <div className="absolute bottom-[110%] left-0 w-[240px] bg-white rounded-2xl shadow-xl border border-[#E8E0D5] overflow-hidden z-50 py-1 origin-bottom-left animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="px-4 py-3 border-b border-[#E8E0D5] flex items-center gap-3">
-             <UserAvatar avatarUrl={user.avatar_url} width={40} height={40} />
+             <UserAvatar avatarUrl={profile.avatar_url} width={40} height={40} />
              <div className="flex flex-col overflow-hidden">
-               <span className="text-sm font-semibold text-[#3D3630] truncate w-full">{user.display_name || 'ผู้ใช้ LinguaQuest'}</span>
-               <span className="text-xs text-[#9A9179] truncate w-full">{user.email || 'Free plan'}</span>
+               <span className="text-sm font-semibold text-[#3D3630] truncate w-full">{profile.display_name || 'ผู้ใช้ LinguaQuest'}</span>
+               <span className="text-xs text-[#9A9179] truncate w-full">{profile.email || 'Free plan'}</span>
              </div>
           </div>
           <div className="p-1">

@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import type { SessionCard } from '@/app/api/flashcard/session/route'
 import { HskFlashcardSession } from '@/components/flashcard/HskFlashcardSession'
-import type { LevelStat } from '@/components/flashcard/LevelSelector'
+import type { LevelStat } from '@/features/flashcard/types'
+import { PosTabView } from '@/features/flashcard/components/PosTabView'
+import { ReviewTabView } from '@/features/flashcard/components/ReviewTabView'
+import { buildSessionContextLabel, SESSION_TABS } from '@/features/flashcard/constants'
 import { LevelSelector } from '@/components/flashcard/LevelSelector'
-import { PosTabView } from '@/components/flashcard/PosTabView'
-import { ReviewTabView } from '@/components/flashcard/ReviewTabView'
 
 interface FlashcardClientProps {
   levelStats: LevelStat[]
@@ -20,18 +21,6 @@ interface SessionContext {
   level: number | 'all'
   pos?: string
   isReviewAll?: boolean
-}
-
-const POS_THAI: Record<string, string> = {
-  动词: 'กริยา',
-  名词: 'คำนาม',
-  形容词: 'คุณศัพท์',
-  副词: 'กริยาวิเศษณ์',
-  连词: 'คำเชื่อม',
-  量词: 'ลักษณนาม',
-  介词: 'บุพบท',
-  代词: 'สรรพนาม',
-  其他: 'อื่นๆ',
 }
 
 export function FlashcardClient({ levelStats, posCountsByLevel }: FlashcardClientProps) {
@@ -107,19 +96,7 @@ export function FlashcardClient({ levelStats, posCountsByLevel }: FlashcardClien
 
   // Build context label for session header
   function buildContextLabel(ctx: SessionContext): string {
-    if (ctx.isReviewAll) {
-      return 'ทบทวนทั้งหมด'
-    }
-    if (ctx.level === 'all' && ctx.pos) {
-      const thaiLabel = POS_THAI[ctx.pos] ?? ctx.pos
-      return `${ctx.pos} · ${thaiLabel} · ทุกระดับ`
-    }
-    const levelLabel = ctx.level === 7 ? 'HSK 7-9' : `HSK ${ctx.level}`
-    if (ctx.pos) {
-      const thaiLabel = POS_THAI[ctx.pos] ?? ctx.pos
-      return `${levelLabel} · ${ctx.pos} · ${thaiLabel}`
-    }
-    return levelLabel
+    return buildSessionContextLabel(ctx.level, ctx.pos, ctx.isReviewAll)
   }
 
   if (view === 'session' && sessionCtx) {
@@ -135,8 +112,8 @@ export function FlashcardClient({ levelStats, posCountsByLevel }: FlashcardClien
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-5 h-5 border-2 border-[#E8E0D5] border-t-[#7D8B6A] rounded-full animate-spin" />
-        <p className="text-sm text-[#9A9179]">กำลังโหลด…</p>
+        <div className="w-5 h-5 border-2 border-border border-t-accent-secondary rounded-full animate-spin" />
+        <p className="text-sm text-text-hint">{SESSION_TABS.review.th}</p>
       </div>
     )
   }
@@ -144,13 +121,13 @@ export function FlashcardClient({ levelStats, posCountsByLevel }: FlashcardClien
   return (
     <div className="w-full space-y-4">
       {error && (
-        <div className="max-w-2xl mx-auto px-4 py-3 rounded-lg bg-[#FDF6F0] border border-[#E8C8B8] text-sm text-[#B56B6B]">
+        <div className="max-w-2xl mx-auto px-4 py-3 rounded-lg bg-error-subtle border border-error/20 text-sm text-error">
           {error}
         </div>
       )}
 
       {/* Tab bar */}
-      <div className="flex gap-2 mb-6 border-b border-[#E8E0D5] pb-4 max-w-lg mx-auto">
+      <div className="flex gap-2 mb-6 border-b border-border pb-4 max-w-lg mx-auto">
         {(['hsk', 'pos', 'review'] as MainTab[]).map((tab) => (
           <button
             type="button"
@@ -159,11 +136,11 @@ export function FlashcardClient({ levelStats, posCountsByLevel }: FlashcardClien
             className={[
               'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
               mainTab === tab
-                ? 'bg-[#3D3630] text-white'
-                : 'text-[#7A7067] hover:text-[#3D3630] hover:bg-[#F0EBE3]',
+                ? 'bg-foreground text-text-inverse'
+                : 'text-text-secondary hover:text-text-primary hover:bg-accent-muted',
             ].join(' ')}
           >
-            {tab === 'hsk' ? 'HSK' : tab === 'pos' ? 'หมวดคำ' : 'ทบทวน'}
+            {tab === 'hsk' ? 'HSK' : tab === 'pos' ? SESSION_TABS.pos.th : SESSION_TABS.review.th}
           </button>
         ))}
       </div>

@@ -68,8 +68,30 @@ loadWorkspaceEnv()
 const withSerwist = withSerwistInit({
   swSrc: 'src/app/sw.ts',
   swDest: 'public/sw.js',
-  disable: process.env.NODE_ENV !== 'production',
+  // Keep SW enabled in dev so NotificationToggle and push features work during development
+  disable: false,
 })
+
+const securityHeaders = [
+  // Prevent clickjacking
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+  // Stop MIME-type sniffing
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  // Minimal referrer info on cross-origin
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  // Disable invasive browser features
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(self), geolocation=(), payment=()',
+  },
+  // HSTS: force HTTPS for 1 year (prod only — localhost exempted by browsers)
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=31536000; includeSubDomains',
+  },
+  // Block XSS in older browsers
+  { key: 'X-XSS-Protection', value: '1; mode=block' },
+]
 
 const nextConfig: NextConfig = {
   transpilePackages: [
@@ -86,6 +108,14 @@ const nextConfig: NextConfig = {
         hostname: '*.supabase.co',
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: securityHeaders,
+      },
+    ]
   },
 }
 

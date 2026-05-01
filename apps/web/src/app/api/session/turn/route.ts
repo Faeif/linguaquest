@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { type CoreMessage, streamText } from 'ai'
+import { type ModelMessage, streamText } from 'ai'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { MODE_INSTRUCTIONS } from '@/features/companion/constants/modes'
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       .replace('{mode_instructions}', modeInstructions)
       .replace('{cefr}', learningDNA.cefr)
       .replace('{goal_tag}', learningDNA.goal_tag)
-      .replace('{display_name}', profile.display_name || 'Student')
+      .replace('{display_name}', profile.display_name || 'ผู้เรียน')
       .replace('{weak_clusters}', learningDNA.weak_clusters.join(', '))
       .replace('{target_vocab_list}', sessionConfig.target_vocab.join(', '))
       .replace('{weak_tones_joined}', learningDNA.weak_tones.join(', '))
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: deepseek,
       system: systemPrompt,
-      messages: messages as CoreMessage[],
+      messages: messages as ModelMessage[],
     })
 
     return result.toTextStreamResponse()

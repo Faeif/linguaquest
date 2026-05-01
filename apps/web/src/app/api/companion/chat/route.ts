@@ -90,10 +90,10 @@ export async function POST(req: Request) {
       model: getChineseModel(),
       system: buildSystemPrompt(ctx),
       messages: [...sanitizedHistory, { role: 'user', content: sanitizedMessage }],
-      maxTokens: 512,
+      maxOutputTokens: 512,
     })
 
-    return result.toDataStreamResponse()
+    return result.toTextStreamResponse()
   } catch (error) {
     if (error instanceof z.ZodError) {
       return Response.json(

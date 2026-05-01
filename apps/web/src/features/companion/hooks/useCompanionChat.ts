@@ -159,6 +159,7 @@ export function useCompanionChat(
       const aiMsgId = (Date.now() + 1).toString()
       let aiContent = ''
       let speechTriggered = false
+      const sessionStartMs = Date.now()
 
       setMessages((prev) => [...prev, { id: aiMsgId, role: 'assistant', content: '' }])
 
@@ -189,6 +190,16 @@ export function useCompanionChat(
         if (finalZh && onSpeechReady) {
           onSpeechReady(finalZh, sessionConfig.companion_id)
         }
+      }
+
+      // Fire session-complete endpoint (non-blocking) when AI signals end of session
+      if (aiContent.includes('SESSION_COMPLETE:')) {
+        const minutes = Math.round((Date.now() - sessionStartMs) / 60000)
+        fetch('/api/session/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ xpEarned: 20, minutes }),
+        }).catch(() => {})
       }
     } catch (err) {
       console.error('Chat stream error:', err)
